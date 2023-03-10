@@ -34,7 +34,7 @@ def information():
     info = info_col.find()
     info = pd.DataFrame(info, dtype = 'float64')
     info = info.drop(columns = ['_id','Unnamed: 0'])
-    st.header('Testdrives Inforamtion')
+    st.header('Testdrives Information')
     st.write(info)
     return info,incident_dict
 #-----------------------------------------------------------------------------------------
