@@ -16,4 +16,4 @@ collection = db[testdrive]
 df = collection.find()
 df = pd.DataFrame(df)
 df = df.drop(columns = ['_id','Unnamed: 0'])
-st.show(df)
+st.write(df)
