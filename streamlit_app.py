@@ -156,7 +156,7 @@ def percent_mode(df):
 def main():
     info, incident_dict = information()
     mileages_stat(info)
-    st.header('Each testdrive data')
+    st.header('Each Testdrive Data')
     selected = st.selectbox('Select testdrive',tuple(subfolders))
     df = loaddb(selected)
     st.header('Viewing: '+str(selected))
