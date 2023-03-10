@@ -11,7 +11,7 @@ connect = 'mongodb+srv://kopkap:kopkap123@cluster0.agjmc4n.mongodb.net/?retryWri
 cluster = MongoClient(connect)
 db = cluster["Senior_project"]
 
-testdrive = st.sidebar.selectbox("Select Testdrive",tuple(db.list_collection_names()))
+testdrive = st.selectbox("Select Testdrive",tuple(db.list_collection_names()))
 collection = db[testdrive]
 df = collection.find()
 df = pd.DataFrame(df)
