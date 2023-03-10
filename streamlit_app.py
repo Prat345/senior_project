@@ -6,6 +6,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
 st.title("Data of Autonomous Vehicles Testdrive")
+st.markdown('#')
 
 # RETRIEVE DATA FROM DB
 connect = 'mongodb+srv://kopkap:kopkap123@cluster0.agjmc4n.mongodb.net/?retryWrites=true&w=majority' # Atlas
@@ -156,15 +157,20 @@ def percent_mode(df):
 def main():
     info, incident_dict = information()
     mileages_stat(info)
+    st.markdown('#')
     st.header('Each Testdrive Data')
     selected = st.selectbox('Select testdrive',tuple(subfolders))
+    st.markdown('#')
     df = loaddb(selected)
     st.header('Viewing: '+str(selected))
     boxes(selected, info)
     df2, map = readfile(selected, df)
     testdrive = selected
+    st.markdown('#')
     graph1(testdrive, df, df2, incident_dict)
+    st.markdown('#')
     graph2(testdrive, df, incident_dict, map)
+    st.markdown('#')
     percent_mode(df)
 
 #-----------------------------------------------------------------------------------------
