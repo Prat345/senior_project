@@ -20,6 +20,8 @@ def loaddb(testdrive):
     df = collection.find()
     df = pd.DataFrame(df, dtype = 'float64')
     df = df.drop(columns = ['_id','Unnamed: 0'])
+    # x = df['msg.mode'][0]
+    # print(x,type(x))
     return df
 # st.write(subfolders)
 #-----------------------------------------------------------------------------------------
@@ -51,7 +53,7 @@ def readfile(testdrive, df):
     for i in range(len(x)):
         temp.append(df[(abs((df['pose.position.x']-x[i])) < n) & (abs((df['pose.position.y']-y[i])) < n)]['Time'])
     df2 = pd.DataFrame(pd.concat(temp,axis = 0))
-    return testdrive, df, df2, map # df2 is list of bus stop
+    return df2, map # df2 is list of bus stop
 #-----------------------------------------------------------------------------------------
 def boxes(testdrive,info):
     df = info
@@ -83,7 +85,7 @@ def mileages_stat(info):
     st.write('Total Mileages: ' + str(round(sum(mileages),2)) + ' meters')
 #-----------------------------------------------------------------------------------------
 def graph1(testdrive, df, df2, incident_dict):
-    st.write("Graph 1")
+    st.header("Figure 1: Incident Occurances")
     plt.figure(figsize=(5,4))
     # plt.title('Plot 1')
     plt.xlabel("Time")  
@@ -92,8 +94,8 @@ def graph1(testdrive, df, df2, incident_dict):
     con2 = incident_dict[testdrive]['Condition2']
     print(con1,con2)
     gb = df.groupby(['msg.mode'])
-    t_auto = gb.get_group(True)['Time']
-    t_manual = gb.get_group(False)['Time']
+    t_auto = gb.get_group('True')['Time']
+    t_manual = gb.get_group('False')['Time']
     h = 5
     # bottom layer
     plt.vlines(x=t_auto, ymin=-h, ymax=h, colors='cornflowerblue', ls='-', lw=1.5, label='Auto')
@@ -107,7 +109,7 @@ def graph1(testdrive, df, df2, incident_dict):
     st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
 def graph2(testdrive, df, incident_dict, map):
-    st.write("Graph 2")
+    st.header("Figure 2: Incident locations")
     plt.figure(figsize=(5,4))
     # plt.title('Plot 2')
     plt.xlabel("Time")
@@ -125,14 +127,14 @@ def graph2(testdrive, df, incident_dict, map):
     st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
 def percent_mode(df):
-    st.write("Percentage of driving modes")
+    st.header("Percentage of driving modes")
     q1,q2= st.columns(2,gap = 'large')
     with q1:
         plt.figure()
         df['delta_x'] = df['pose.position.x'].diff()
         df['delta_y'] = df['pose.position.y'].diff()
         df['distance'] = (df['delta_x']**2 + df['delta_y']**2)**0.5
-        auto = df[df['msg.mode'] == True]['distance'].sum(axis=0)
+        auto = df[df['msg.mode'] == 'True']['distance'].sum(axis=0)
         d = df['distance'].sum(axis=0)
         auto = round(auto,2); d = round(d,2); manu = round(d-auto,2)
         p_auto = round(auto/d * 100,2)
@@ -159,7 +161,8 @@ def main():
     df = loaddb(selected)
     st.header('Viewing: '+str(selected))
     boxes(selected, info)
-    testdrive, df, df2, map = readfile(selected, df)
+    df2, map = readfile(selected, df)
+    testdrive = selected
     graph1(testdrive, df, df2, incident_dict)
     graph2(testdrive, df, incident_dict, map)
     percent_mode(df)
@@ -168,3 +171,4 @@ def main():
 
 main()
 st.header('*'*70)
+st.image('the-rock-eyebrow.gif')
