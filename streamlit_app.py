@@ -74,10 +74,25 @@ def mileages_stat(info):
         mileages_dict[vehicle] = gb.get_group(vehicle)['mileages'].sum(axis=0)
     vehicles = list(mileages_dict.keys())
     mileages = list(mileages_dict.values())
-    fig = plt.figure(figsize = (5,4))
-    plt.bar(vehicles, mileages, color =['darkcyan','navy','lightskyblue'],width = 0.4)
+    fig = plt.subplots(figsize = (5,4))
+    barwidth = 0.4
+    x1 = np.arange(len(mileages))
+    x2 = [i + barwidth for i in x1]
+    plt.bar(x1, mileages, color = 'orange',width = barwidth, label = 'Total Mileages')
     for i, v in enumerate(mileages):
         plt.text(float(i)-.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
+    #----------------------------------------------------
+    auto_dict = {}
+    for vehicle in ['T1','T2-B','T2-W']:
+        auto = gb.get_group(vehicle)['mileages'] * gb.get_group(vehicle)['p_auto']/100
+        auto_dict[vehicle] = auto.sum(axis=0)
+    auto = list(auto_dict.values())
+    plt.bar(x2, auto, color ='navy',width = barwidth, label = 'Autonomous')
+    for i, v in enumerate(auto):
+        plt.text(float(i)+.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
+    #----------------------------------------------------
+    plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
+    plt.xticks([r + barwidth/2 for r in range(len(vehicles))],vehicles)
     plt.xlabel("Vehicle") 
     plt.ylabel("mileages(m)") 
     plt.style.use('seaborn-whitegrid')
