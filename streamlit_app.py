@@ -68,38 +68,83 @@ def boxes(testdrive,info):
     col4.metric('Time', str(df.iloc[index]['time']))
 #-----------------------------------------------------------------------------------------
 def mileages_stat(info):
-    df = info
-    mileages_dict = {}
-    gb = df.groupby(['vehicle'])
-    for vehicle in ['T1','T2-B','T2-W']:
-        mileages_dict[vehicle] = gb.get_group(vehicle)['mileages'].sum(axis=0)
-    vehicles = list(mileages_dict.keys())
-    mileages = list(mileages_dict.values())
-    fig = plt.subplots(figsize = (5,4))
-    barwidth = 0.4
-    x1 = np.arange(len(mileages))
-    x2 = [i + barwidth for i in x1]
-    plt.bar(x1, mileages, color = 'orange',width = barwidth, label = 'Total Mileages')
-    for i, v in enumerate(mileages):
-        plt.text(float(i)-.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
+    q1,q2= st.columns(2,gap = 'large')
+    with q1:
+        df = info
+        mileages_dict = {}
+        gb = df.groupby(['vehicle'])
+        for vehicle in ['T1','T2-B','T2-W']:
+            mileages_dict[vehicle] = gb.get_group(vehicle)['mileages'].sum(axis=0)
+        vehicles = list(mileages_dict.keys())
+        mileages = list(mileages_dict.values())
+        fig = plt.subplots(figsize = (5,4))
+        barwidth = 0.4
+        x1 = np.arange(len(mileages))
+        x2 = [i + barwidth for i in x1]
+        plt.bar(x1, mileages, color = 'orange',width = barwidth, label = 'Total Mileages')
+        for i, v in enumerate(mileages):
+            plt.text(float(i)-.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
+        #----------------------------------------------------
+        auto_dict = {}
+        for vehicle in ['T1','T2-B','T2-W']:
+            auto = gb.get_group(vehicle)['mileages'] * gb.get_group(vehicle)['p_auto']/100
+            auto_dict[vehicle] = auto.sum(axis=0)
+        auto = list(auto_dict.values())
+        plt.bar(x2, auto, color ='navy',width = barwidth, label = 'Autonomous')
+        for i, v in enumerate(auto):
+            plt.text(float(i)+.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
+        #----------------------------------------------------
+        plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
+        plt.xticks([r + barwidth/2 for r in range(len(vehicles))],vehicles)
+        plt.xlabel("Vehicle") 
+        plt.ylabel("mileages(m)") 
+        plt.style.use('seaborn-whitegrid')
+        st.header('Mileages Statistics')
+        st.pyplot(plt) # streamlit
     #----------------------------------------------------
-    auto_dict = {}
-    for vehicle in ['T1','T2-B','T2-W']:
-        auto = gb.get_group(vehicle)['mileages'] * gb.get_group(vehicle)['p_auto']/100
-        auto_dict[vehicle] = auto.sum(axis=0)
-    auto = list(auto_dict.values())
-    plt.bar(x2, auto, color ='navy',width = barwidth, label = 'Autonomous')
-    for i, v in enumerate(auto):
-        plt.text(float(i)+.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
+    with q2:
+        df['month'] = df['date'].str[:-3]
+        df['p'] = df['mileages'] * df['p_auto']/100
+        # p = df['mileages'] * df['p_auto']
+        gb = df.groupby('month')
+        month_list = list(gb.groups.keys())
+        auto_dict = {}
+        mileages_dict = {}
+        for m in month_list:
+            a = gb.get_group(m)['p'].sum(axis=0)
+            d = gb.get_group(m)['mileages'].sum(axis=0)
+            ans = round(a/d*100,2)
+            auto_dict[m] = ans
+            mileages_dict[m] = d
+            
+        fig, ax1 = plt.subplots(figsize=(5,4))
+        ax2 = ax1.twinx()
+        ax1.set_ylim(0,10000)
+        ax2.set_ylim(0,100)
+
+        x = auto_dict.keys()
+        y = auto_dict.values()
+        y2 = mileages_dict.values()
+
+        ax1.bar(x, y2, color='orange',width = barwidth ,label = 'mileages')
+        ax1.set_ylabel("Mileages") 
+
+        ax2.plot(x, y, '-',color='blue',label = 'Auto%')
+        ax1.set_xlabel("months") 
+        ax2.set_ylabel("Autonomous(%)") 
+        fig.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
+        # ax1.grid(False)
+        ax2.grid(False)
+        plt.style.use('seaborn-whitegrid')
+        st.header('Autonomous Percentage Monthly')
+        st.pyplot(plt)
     #----------------------------------------------------
-    plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
-    plt.xticks([r + barwidth/2 for r in range(len(vehicles))],vehicles)
-    plt.xlabel("Vehicle") 
-    plt.ylabel("mileages(m)") 
-    plt.style.use('seaborn-whitegrid')
-    st.header('Mileages Statistics')
-    st.pyplot(plt) # streamlit
-    st.write('Total Mileages: ' + str(round(sum(mileages),2)) + ' meters')
+    total_mileages = round(sum(mileages),2)
+    total_auto = round(sum(auto),2)
+    p_auto = round(total_auto/total_mileages*100,2)
+    col1, col2, col3 = st.columns(3)
+    col1.metric('Total Mileages(m)',str(total_mileages))
+    col2.metric('Autonomous %',str(p_auto))
 #-----------------------------------------------------------------------------------------
 def graph1(testdrive, df, df2, incident_dict):
     st.header("Figure 1: Incident Occurances")
