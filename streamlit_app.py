@@ -102,6 +102,7 @@ def mileages_stat(info):
         plt.xlabel("Vehicle") 
         plt.ylabel("mileages(m)") 
         st.header('Mileages Statistics')
+        plt.style.use('seaborn-whitegrid')
         st.pyplot(plt) # streamlit
     #----------------------------------------------------
     with q2:
@@ -138,6 +139,7 @@ def mileages_stat(info):
         # ax1.grid(False)
         ax2.grid(False)
         st.header('Autonomous Percentage Monthly')
+        plt.style.use('seaborn-whitegrid')
         st.pyplot(plt)
     #----------------------------------------------------
     total_mileages = round(sum(mileages),2)
@@ -170,6 +172,7 @@ def graph1(testdrive, df, df2, incident_dict):
     plt.vlines(x=con2, ymin=-h, ymax=h, colors='blue', ls='--', lw=1.5, label='Condition2')
     # top layer
     plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
+    plt.style.use('seaborn-whitegrid')
     st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
 def graph2(testdrive, df, incident_dict, map):
@@ -189,6 +192,7 @@ def graph2(testdrive, df, incident_dict, map):
     plt.scatter(df.iloc[loc1]['pose.position.x'],df.iloc[loc1]['pose.position.y'],s=100,color = 'red',marker = '^',label = 'Condition1')
     plt.scatter(df.iloc[loc2]['pose.position.x'],df.iloc[loc2]['pose.position.y'],s=100,color = 'blue',marker = '^', label = 'Condition2')
     plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
+    plt.style.use('seaborn-whitegrid')
     st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
 def percent_mode(df):
