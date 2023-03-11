@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pymongo
 from pymongo import MongoClient
 import streamlit as st
+import numpy as np
 
 st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
 st.title("Data of Autonomous Vehicles Testdrive")
