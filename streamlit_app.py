@@ -153,7 +153,8 @@ def graph1(testdrive, df, df2, incident_dict):
     st.header("Figure 1: Incident Occurances")
     plt.figure(figsize=(5,4))
     # plt.title('Plot 1')
-    plt.xlabel("Time")  
+    plt.xlabel("Time")
+    plt.ylabel('Acceleration(m/s^2)')
     plt.style.use('seaborn-whitegrid')
     con1 = incident_dict[testdrive]['Condition1']
     con2 = incident_dict[testdrive]['Condition2']
@@ -177,7 +178,8 @@ def graph2(testdrive, df, incident_dict, map):
     st.header("Figure 2: Incident locations")
     plt.figure(figsize=(5,4))
     # plt.title('Plot 2')
-    plt.xlabel("Time")
+    plt.xlabel("X coordinates")
+    plt.ylabel("Y coordinates")
     plt.scatter(df['pose.position.x'],df['pose.position.y'],color = 'lime',s = 3,label = 'Route')
     for index,row in map.iterrows():
         x = row['x']
