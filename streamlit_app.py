@@ -101,7 +101,6 @@ def mileages_stat(info):
         plt.xticks([r + barwidth/2 for r in range(len(vehicles))],vehicles)
         plt.xlabel("Vehicle") 
         plt.ylabel("mileages(m)") 
-        plt.style.use('seaborn-whitegrid')
         st.header('Mileages Statistics')
         st.pyplot(plt) # streamlit
     #----------------------------------------------------
@@ -138,7 +137,6 @@ def mileages_stat(info):
         fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
         # ax1.grid(False)
         ax2.grid(False)
-        plt.style.use('seaborn-whitegrid')
         st.header('Autonomous Percentage Monthly')
         st.pyplot(plt)
     #----------------------------------------------------
