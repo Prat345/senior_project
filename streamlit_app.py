@@ -135,7 +135,7 @@ def mileages_stat(info):
         ax2.plot(x, y, '-',color='blue',label = 'Auto%')
         ax1.set_xlabel("months") 
         ax2.set_ylabel("Autonomous(%)") 
-        fig.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
+        fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
         # ax1.grid(False)
         ax2.grid(False)
         plt.style.use('seaborn-whitegrid')
