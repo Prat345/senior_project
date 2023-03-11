@@ -219,7 +219,7 @@ def main():
     info, incident_dict = information()
     mileages_stat(info)
     st.markdown('#')
-    st.header('Each Testdrive Data')
+    st.header('Individual Testdrive Data')
     selected = st.selectbox('Select testdrive',tuple(subfolders))
     st.markdown('#')
     df = loaddb(selected)
@@ -228,14 +228,14 @@ def main():
     df2, map = readfile(selected, df)
     testdrive = selected
     st.markdown('#')
-    graph1(testdrive, df, df2, incident_dict)
-    st.markdown('#')
-    graph2(testdrive, df, incident_dict, map)
+    q1,q2= st.columns(2,gap = 'large')
+    with q1:
+        graph1(testdrive, df, df2, incident_dict)
+    with q2:
+        graph2(testdrive, df, incident_dict, map)
     st.markdown('#')
     percent_mode(df)
-
 #-----------------------------------------------------------------------------------------
-
 main()
 st.header('*'*70)
 st.image('the-rock-eyebrow.gif')
