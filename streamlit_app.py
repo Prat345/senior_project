@@ -9,8 +9,8 @@ st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
 st.title("Data of Autonomous Vehicles Testdrive")
 st.markdown('#')
 
-with open(style.css') as f:
-          st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+with open('/style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # RETRIEVE DATA FROM DB
 connect = 'mongodb+srv://kopkap:kopkap123@cluster0.agjmc4n.mongodb.net/?retryWrites=true&w=majority' # Atlas
