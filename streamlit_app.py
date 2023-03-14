@@ -241,7 +241,7 @@ def main():
     with q2:
         graph2(testdrive, df, incident_dict, map)
     st.markdown('#')
-    st.write(df[df['incident_flag'] != 0][['Time','msg.mode','msg.brake','linear_acceleration.x_filtered','elasped_time','incident_flag']])
+    st.write(df[df['incident_flag'] != 0])
     st.markdown('#')
     percent_mode(df)
 #-----------------------------------------------------------------------------------------
