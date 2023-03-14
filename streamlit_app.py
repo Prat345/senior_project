@@ -45,6 +45,7 @@ def readfile(testdrive, df):
     # with open(os.path.join(folder_path, testdrive +'/'+'waypoints_map.csv')) as f:
     #     map = pd.read_csv(f)
     testdrive = testdrive.replace('-','')
+    testdrive = testdrive.replace('Chula','CU')
     vehicle,operator,location,date = testdrive.split('_')
     with open(f'waypoint_{vehicle}_{location}.csv') as f:
         map = pd.read_csv(f)
