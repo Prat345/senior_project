@@ -16,7 +16,7 @@ with open('style.css') as f:
 connect = 'mongodb+srv://kopkap:kopkap123@cluster0.agjmc4n.mongodb.net/?retryWrites=true&w=majority' # Atlas
 # connect = 'mongodb://localhost:27017' # Compass 
 cluster = MongoClient(connect)
-db1 = cluster["Senior_project"]
+db1 = cluster["Testdrive"]
 subfolders = db1.list_collection_names()
 
 def loaddb(testdrive):
