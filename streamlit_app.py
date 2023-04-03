@@ -99,10 +99,11 @@ def mileages_stat(info):
         #----------------------------------------------------
         plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
         plt.xticks([r + barwidth/2 for r in range(len(vehicles))],vehicles)
+        plt.ylim(0,round(max(mileages),-3)+2000)
         plt.xlabel("Vehicle") 
         plt.ylabel("mileages(m)") 
+        # plt.style.use('seaborn-whitegrid')
         st.header('Mileages Statistics')
-        plt.style.use('seaborn-whitegrid')
         st.pyplot(plt) # streamlit
     #----------------------------------------------------
     with q2:
@@ -121,14 +122,15 @@ def mileages_stat(info):
             mileages_dict[m] = d
             
         fig, ax1 = plt.subplots(figsize=(5,4))
+        plt.style.use('seaborn-whitegrid')
         ax2 = ax1.twinx()
-        ax1.set_ylim(0,10000)
-        ax2.set_ylim(0,100)
-
+        
         x = auto_dict.keys()
         y = auto_dict.values()
         y2 = mileages_dict.values()
 
+        ax1.set_ylim(0,round(max(y2),-3)+2000)
+        ax2.set_ylim(0,100)
         ax1.bar(x, y2, color='orange',width = barwidth ,label = 'mileages')
         ax1.set_ylabel("Mileages") 
 
@@ -139,7 +141,6 @@ def mileages_stat(info):
         # ax1.grid(False)
         ax2.grid(False)
         st.header('Autonomous Percentage Monthly')
-        plt.style.use('seaborn-whitegrid')
         st.pyplot(plt)
     #----------------------------------------------------
     total_mileages = round(sum(mileages),2)
