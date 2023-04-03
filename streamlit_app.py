@@ -151,7 +151,7 @@ def mileages_stat(info):
     col2.metric('Autonomous %',str(p_auto))
 #-----------------------------------------------------------------------------------------
 def plotg(testdrive, df, topic):
-    st.markdown(f"Plot {topic}")
+    st.markdown(f"{topic}")
     plt.figure(figsize=(5,4))
     plt.xlabel("Time")  
     plt.style.use('seaborn-whitegrid')
