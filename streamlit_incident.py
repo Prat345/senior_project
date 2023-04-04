@@ -26,7 +26,8 @@ st.write('Total incidents')
 st.write(df.drop(columns = ['_id']))
 
 st.markdown('#')
-st.header('Select Tags')
+st.image('Tags.png')
+st.write('Select Tags')
 factors = ['External','Internal']
 # EXTERNAL
 actors = ['Vehicle','Truck','Tuk-Tuk','Bus','Motorcycle','Pedestrian','Animal','Cyclist','Scooter','Non-Motor Vehicle','Other Vehicle']
