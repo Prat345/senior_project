@@ -26,6 +26,7 @@ st.write('Total incidents')
 st.write(df.drop(columns = ['_id']))
 
 st.markdown('#')
+st.write('List of Tags')
 st.image('Tags.png')
 st.write('Select Tags')
 factors = ['External','Internal']
