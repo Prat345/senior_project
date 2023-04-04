@@ -6,6 +6,7 @@ import streamlit as st
 import numpy as np
 import os
 import webbrowser
+from pathlib import Path
 
 # RETRIEVE DATA FROM DB
 connect = 'mongodb+srv://kopkap:kopkap123@cluster0.agjmc4n.mongodb.net/?retryWrites=true&w=majority' # Atlas
@@ -69,10 +70,9 @@ def data_query():
             df2 = collection2.find()
             df2 = pd.DataFrame(df2)
             df2 = df2.drop(columns = ['_id','Unnamed: 0'])
-            df2.to_csv(f'{testdrive}.csv')
-            os.startfile(f'{testdrive}.csv')
-
+            downloads_path = str(Path.home() / "Downloads")
+            df2.to_csv(f'{downloads_path}/{testdrive}.csv')
+            os.startfile(f'{downloads_path}/{testdrive}.csv')
     #-------------------------------------------------------------------------------------------------
 if tags !=[]:
     data_query()
-
