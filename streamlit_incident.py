@@ -21,6 +21,8 @@ st.header('Incident Search')
 st.markdown('#')
 df = collection.find()
 df = pd.DataFrame(df)
+df = df[df['tags'] != ""]
+st.write('Total incidents')
 st.write(df.drop(columns = ['_id']))
 
 st.markdown('#')
