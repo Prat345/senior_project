@@ -6,7 +6,7 @@ import streamlit as st
 import numpy as np
 import os
 import webbrowser
-from pathlib import Path
+import base64
 
 # RETRIEVE DATA FROM DB
 connect = 'mongodb+srv://kopkap:kopkap123@cluster0.agjmc4n.mongodb.net/?retryWrites=true&w=majority' # Atlas
@@ -56,23 +56,24 @@ def data_query():
     path = df_i.iloc[selected ,df.columns.get_loc('path')]
     URL = df_i.iloc[selected ,df.columns.get_loc('url')]
     testdrive = df_i.iloc[selected ,df.columns.get_loc('testdrive')]
+    st.write('Video(drive)')
     st.write(URL)
-    q1,q2,q3,q4= st.columns(4)
-    with q1:
-        if st.button('Video(local)'):
-            os.startfile(path)
-    with q2:
-        if st.button('Video(drive)'):
-            webbrowser.open(URL)
-    with q3:
-        if st.button('CSV(db)'):
-            collection2 = db2[testdrive]
-            df2 = collection2.find()
-            df2 = pd.DataFrame(df2)
-            df2 = df2.drop(columns = ['_id','Unnamed: 0'])
-            downloads_path = str(Path.home() / "Downloads")
-            df2.to_csv(f'{downloads_path}/{testdrive}.csv')
-            os.startfile(f'{downloads_path}/{testdrive}.csv')
+    # q1,q2,q3,q4= st.columns(4)
+    # with q1:
+    #     if st.button('Video(local)'):
+    #         os.startfile(path)
+    # with q2:
+    #     if st.button('Video(drive)'):
+    #         webbrowser.open(URL)
+    collection2 = db2[testdrive]
+    df2 = collection2.find()
+    df2 = pd.DataFrame(df2)
+    df2 = df2.drop(columns = ['_id','Unnamed: 0'])
+    csv = df2.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="{testdrive}.csv">Download CSV</a>'
+    st.write('CSV(db)')
+    st.markdown(href, unsafe_allow_html=True)       
     #-------------------------------------------------------------------------------------------------
 if tags !=[]:
     data_query()
