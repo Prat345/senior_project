@@ -55,7 +55,7 @@ def data_query():
     path = df_i.iloc[selected ,df.columns.get_loc('path')]
     URL = df_i.iloc[selected ,df.columns.get_loc('url')]
     testdrive = df_i.iloc[selected ,df.columns.get_loc('testdrive')]
-    # st.write(path)
+    st.write(URL)
     q1,q2,q3,q4= st.columns(4)
     with q1:
         if st.button('Video(local)'):
