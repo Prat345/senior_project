@@ -264,4 +264,4 @@ def main():
 #-----------------------------------------------------------------------------------------
 main()
 st.header('*'*70)
-st.image('the-rock-eyebrow.gif')
+# st.image('the-rock-eyebrow.gif')
