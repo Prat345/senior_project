@@ -245,3 +245,7 @@ def main():
         percent_mode(df)
 #-----------------------------------------------------------------------------------------
 main()
+
+st.markdown('#')
+st.write('Incident Query')
+st.write('https://kopkap345-streamlit-test-streamlit-incident-4mwzm2.streamlit.app/')
