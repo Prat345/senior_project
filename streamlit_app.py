@@ -49,7 +49,7 @@ def readfile(testdrive, df):
     testdrive = testdrive.replace('-','')
     testdrive = testdrive.replace('Chula','CU')
     vehicle,operator,location,date = testdrive.split('_')
-    with open(f'D:\FOOH\Senior_Project\map\waypoint_{vehicle}_{location}.csv') as f:
+    with open(f'waypoint_{vehicle}_{location}.csv') as f:
         map = pd.read_csv(f)
     # map = map[map['event_flag'] != 0]
     x = list(map['x'])
