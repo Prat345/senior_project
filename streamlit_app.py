@@ -152,8 +152,14 @@ def mileages_stat(info):
         ax2.grid(False)
         st.markdown('Autonomous Percentage Monthly')
         st.pyplot(plt)
-    #----------------------------------------------------
-
+#-----------------------------------------------------------------------------------------
+def plotg(df, topic):
+    st.markdown(f"{topic}")
+    plt.figure(figsize=(5,4))
+    plt.xlabel("Time")  
+    plt.style.use('seaborn-whitegrid')
+    plt.plot(df['Time'],df[topic],color = color2, linestyle = '-', lw=1, label = topic)
+    st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
 def graph1(testdrive, df, df2, incident_dict):
     st.markdown("Incident Occurrences")
@@ -235,6 +241,14 @@ def main():
     boxes(selected, info)
     df2, map = readfile(selected, df)
     testdrive = selected
+    st.markdown('#')
+    q1,q2,q3= st.columns(3,gap = 'large')
+    with q1:
+        plotg(df, 'linear_acceleration.x_filtered')
+    with q2:
+        plotg(df, 'msg.brake')
+    with q3:
+        plotg(df, 'msg.mode') 
     st.markdown('#')
     q1,q2,q3= st.columns(3,gap = 'large')
     with q1:
