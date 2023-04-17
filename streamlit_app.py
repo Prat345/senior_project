@@ -6,9 +6,11 @@ import streamlit as st
 import numpy as np
 
 st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
-st.title("Data of Autonomous Vehicles Testdrive")
+st.title("Test drive Dashboard")
 st.markdown('#')
 
+color1 = 'turquoise'
+color2 = 'darkcyan'
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
@@ -37,8 +39,8 @@ def information():
     info = info_col.find()
     info = pd.DataFrame(info, dtype = 'float64')
     info = info.drop(columns = ['_id','Unnamed: 0'])
-    st.header('Testdrives Information')
-    st.write(info)
+    # st.header('Testdrives Information')
+    # st.write(info)
     return info,incident_dict
 #-----------------------------------------------------------------------------------------
 def readfile(testdrive, df):
@@ -47,9 +49,8 @@ def readfile(testdrive, df):
     testdrive = testdrive.replace('-','')
     testdrive = testdrive.replace('Chula','CU')
     vehicle,operator,location,date = testdrive.split('_')
-    with open(f'waypoint_{vehicle}_{location}.csv') as f:
+    with open(f'D:\FOOH\Senior_Project\map\waypoint_{vehicle}_{location}.csv') as f:
         map = pd.read_csv(f)
-
     # map = map[map['event_flag'] != 0]
     x = list(map['x'])
     y = list(map['y'])
@@ -71,29 +72,38 @@ def boxes(testdrive,info):
     col4.metric('Time', str(df.iloc[index]['time']))
 #-----------------------------------------------------------------------------------------
 def mileages_stat(info):
+    df = info
+    mileages_dict = {}
+    gb = df.groupby(['vehicle'])
+    for vehicle in ['T1','T2-B','T2-W']:
+        mileages_dict[vehicle] = gb.get_group(vehicle)['mileages'].sum(axis=0)
+    vehicles = list(mileages_dict.keys())
+    mileages = list(mileages_dict.values())
+    auto_dict = {}
+    for vehicle in ['T1','T2-B','T2-W']:
+        auto = gb.get_group(vehicle)['mileages'] * gb.get_group(vehicle)['p_auto']/100
+        auto_dict[vehicle] = auto.sum(axis=0)
+    auto = list(auto_dict.values())
+    #-------------------------------------------------------
+    total_mileages = round(sum(mileages),2)
+    total_auto = round(sum(auto),2)
+    p_auto = round(total_auto/total_mileages*100,2)
+    col1, col2, col3 = st.columns(3)
+    col1.metric('Total Mileages(m)',str(total_mileages))
+    col2.metric('Autonomous %',str(p_auto))
+    col3.metric('Test drives',str(len(info)))
+    #-------------------------------------------------------
     q1,q2= st.columns(2,gap = 'large')
     with q1:
-        df = info
-        mileages_dict = {}
-        gb = df.groupby(['vehicle'])
-        for vehicle in ['T1','T2-B','T2-W']:
-            mileages_dict[vehicle] = gb.get_group(vehicle)['mileages'].sum(axis=0)
-        vehicles = list(mileages_dict.keys())
-        mileages = list(mileages_dict.values())
         fig = plt.subplots(figsize = (5,4))
         barwidth = 0.4
         x1 = np.arange(len(mileages))
         x2 = [i + barwidth for i in x1]
-        plt.bar(x1, mileages, color = 'orange',width = barwidth, label = 'Total Mileages')
+        plt.bar(x1, mileages, color = color2,width = barwidth, label = 'Total Mileages')
         for i, v in enumerate(mileages):
             plt.text(float(i)-.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
         #----------------------------------------------------
-        auto_dict = {}
-        for vehicle in ['T1','T2-B','T2-W']:
-            auto = gb.get_group(vehicle)['mileages'] * gb.get_group(vehicle)['p_auto']/100
-            auto_dict[vehicle] = auto.sum(axis=0)
-        auto = list(auto_dict.values())
-        plt.bar(x2, auto, color ='navy',width = barwidth, label = 'Autonomous')
+        plt.bar(x2, auto, color = color1,width = barwidth, label = 'Autonomous')
         for i, v in enumerate(auto):
             plt.text(float(i)+.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
         #----------------------------------------------------
@@ -103,7 +113,7 @@ def mileages_stat(info):
         plt.xlabel("Vehicle") 
         plt.ylabel("mileages(m)") 
         # plt.style.use('seaborn-whitegrid')
-        st.header('Mileages Statistics')
+        st.markdown('Mileages Statistics')
         st.pyplot(plt) # streamlit
     #----------------------------------------------------
     with q2:
@@ -131,35 +141,22 @@ def mileages_stat(info):
 
         ax1.set_ylim(0,round(max(y2),-3)+2000)
         ax2.set_ylim(0,100)
-        ax1.bar(x, y2, color='orange',width = barwidth ,label = 'mileages')
+        ax1.bar(x, y2, color=color2,width = barwidth ,label = 'mileages')
         ax1.set_ylabel("Mileages") 
 
-        ax2.plot(x, y, '-',color='blue',label = 'Auto%')
+        ax2.plot(x, y, '-',color=color1,label = 'Auto%')
         ax1.set_xlabel("months") 
         ax2.set_ylabel("Autonomous(%)") 
         fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
         # ax1.grid(False)
         ax2.grid(False)
-        st.header('Autonomous Percentage Monthly')
+        st.markdown('Autonomous Percentage Monthly')
         st.pyplot(plt)
     #----------------------------------------------------
-    total_mileages = round(sum(mileages),2)
-    total_auto = round(sum(auto),2)
-    p_auto = round(total_auto/total_mileages*100,2)
-    col1, col2, col3 = st.columns(3)
-    col1.metric('Total Mileages(m)',str(total_mileages))
-    col2.metric('Autonomous %',str(p_auto))
-#-----------------------------------------------------------------------------------------
-def plotg(testdrive, df, topic):
-    st.markdown(f"{topic}")
-    plt.figure(figsize=(5,4))
-    plt.xlabel("Time")  
-    plt.style.use('seaborn-whitegrid')
-    plt.plot(df['Time'],df[topic],color = 'black',linestyle = '-', lw=1, label = topic)
-    st.pyplot(plt) # streamlit
+
 #-----------------------------------------------------------------------------------------
 def graph1(testdrive, df, df2, incident_dict):
-    st.header("Figure 1: Incident Occurances")
+    st.markdown("Incident Occurances")
     plt.figure(figsize=(5,4))
     # plt.title('Plot 1')
     plt.xlabel("Time")
@@ -173,8 +170,8 @@ def graph1(testdrive, df, df2, incident_dict):
     t_manual = gb.get_group('False')['Time']
     h = 5
     # bottom layer
-    plt.vlines(x=t_auto, ymin=-h, ymax=h, colors='cornflowerblue', ls='-', lw=1.5, label='Auto')
-    plt.vlines(x=t_manual, ymin=-h, ymax=h, colors='lightcoral', ls='-', lw=1.5, label='Manual')
+    plt.vlines(x=t_auto, ymin=-h, ymax=h, colors= color1, ls='-', lw=1.5, label='Auto')
+    plt.vlines(x=t_manual, ymin=-h, ymax=h, colors= color2, ls='-', lw=1.5, label='Manual')
     plt.vlines(df2['Time'], ymin=-1, ymax=1, color = 'gold',label = 'Stops')
     plt.plot(df['Time'],df['linear_acceleration.x_filtered'],color = 'black',linestyle = '-',label = 'Acceleration_x')
     plt.vlines(x=con1, ymin=-h, ymax=h, colors='red', ls='-', lw=2, label='Condition1')
@@ -185,12 +182,12 @@ def graph1(testdrive, df, df2, incident_dict):
     st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
 def graph2(testdrive, df, incident_dict, map):
-    st.header("Figure 2: Incident locations")
+    st.markdown("Incident locations")
     plt.figure(figsize=(5,4))
     # plt.title('Plot 2')
     plt.xlabel("X coordinates")
     plt.ylabel("Y coordinates")
-    plt.scatter(df['pose.position.x'],df['pose.position.y'],color = 'lime',s = 3,label = 'Route')
+    plt.scatter(df['pose.position.x'],df['pose.position.y'],color = color1,s = 3,label = 'Route')
     for index,row in map.iterrows():
         x = row['x']
         y = row['y']
@@ -205,63 +202,46 @@ def graph2(testdrive, df, incident_dict, map):
     st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
 def percent_mode(df):
-    st.header("Percentage of driving modes")
-    q1,q2= st.columns(2,gap = 'large')
-    with q1:
-        plt.figure()
-        df['delta_x'] = df['pose.position.x'].diff()
-        df['delta_y'] = df['pose.position.y'].diff()
-        df['distance'] = (df['delta_x']**2 + df['delta_y']**2)**0.5
-        auto = df[df['msg.mode'] == 'True']['distance'].sum(axis=0)
-        d = df['distance'].sum(axis=0)
-        auto = round(auto,2); d = round(d,2); manu = round(d-auto,2)
-        p_auto = round(auto/d * 100,2)
-        p_manu = round((100-p_auto),2)
+    st.markdown("Driving mode percentage")
+    plt.figure()
+    df['delta_x'] = df['pose.position.x'].diff()
+    df['delta_y'] = df['pose.position.y'].diff()
+    df['distance'] = (df['delta_x']**2 + df['delta_y']**2)**0.5
+    auto = df[df['msg.mode'] == 'True']['distance'].sum(axis=0)
+    d = df['distance'].sum(axis=0)
+    auto = round(auto,2); d = round(d,2); manu = round(d-auto,2)
+    p_auto = round(auto/d * 100,2)
+    p_manu = round((100-p_auto),2)
 
-        df2 = pd.DataFrame()
-        df2['mode'] = ['auto','manual']
-        df2['distance'] = [auto,manu]
-        df2['Percentages'] = [p_auto, p_manu]
+    df2 = pd.DataFrame()
+    df2['mode'] = ['auto','manual']
+    df2['distance'] = [auto,manu]
+    df2['Percentages'] = [p_auto, p_manu]
 
-        # plt.title("Percentage of driving modes")
-        plt.pie([auto,manu], labels=['Autonomous','Manual'], autopct='%1.1f%%',colors=['blue','red'])
-        st.pyplot(plt) # streamlit
-    with q2:
-        st.write('Distance:',d)
-        st.write('Auto:',auto,'Manual:',manu)
-        st.write(df2)
+    # plt.title("Percentage of driving modes")
+    plt.pie([auto,manu], labels=['Autonomous','Manual'], autopct='%1.1f%%',colors=[color1,color2])
+    st.pyplot(plt) # streamlit
+
 #-----------------------------------------------------------------------------------------
 def main():
     info, incident_dict = information()
     mileages_stat(info)
     st.markdown('#')
-    st.header('Individual Testdrive Data')
     selected = st.selectbox('Select testdrive',tuple(subfolders))
     st.markdown('#')
     df = loaddb(selected)
     st.header('Viewing: '+str(selected))
+    st.markdown('#')
     boxes(selected, info)
     df2, map = readfile(selected, df)
     testdrive = selected
     st.markdown('#')
     q1,q2,q3= st.columns(3,gap = 'large')
     with q1:
-        plotg(testdrive, df, 'linear_acceleration.x_filtered')
-    with q2:
-        plotg(testdrive, df, 'msg.brake')
-    with q3:
-        plotg(testdrive, df, 'msg.mode') 
-    st.markdown('#')
-    q1,q2= st.columns(2,gap = 'large')
-    with q1:
         graph1(testdrive, df, df2, incident_dict)
     with q2:
         graph2(testdrive, df, incident_dict, map)
-    st.markdown('#')
-    st.write(df[df['incident_flag'] != 0])
-    st.markdown('#')
-    percent_mode(df)
+    with q3:
+        percent_mode(df)
 #-----------------------------------------------------------------------------------------
 main()
-st.header('*'*70)
-# st.image('the-rock-eyebrow.gif')
