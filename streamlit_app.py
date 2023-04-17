@@ -156,7 +156,7 @@ def mileages_stat(info):
 
 #-----------------------------------------------------------------------------------------
 def graph1(testdrive, df, df2, incident_dict):
-    st.markdown("Incident Occurances")
+    st.markdown("Incident Occurrences")
     plt.figure(figsize=(5,4))
     # plt.title('Plot 1')
     plt.xlabel("Time")
