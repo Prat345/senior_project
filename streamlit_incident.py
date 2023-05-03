@@ -59,6 +59,7 @@ st.markdown('#')
 df = collection.find()
 df = pd.DataFrame(df)
 df = df[df['tags'] != ""]
+df = df.drop(columns = ['path'])
 df.index = np.arange(1, len(df) + 1)
 st.write(f'{len(df)} Total incidents')
 st.write(df.drop(columns = ['_id']))
