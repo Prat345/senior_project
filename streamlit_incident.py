@@ -96,7 +96,7 @@ def data_query():
     value = tags
     queries = collection.find({key:{"$all":value}})
     df_i = pd.DataFrame(queries)
-    df_i = df_i.drop('path')
+    df_i = df_i.drop(columns = ['path'])
     df_i.index = np.arange(1, len(df_i) + 1)
     st.markdown('#')
     st.write('Results')
