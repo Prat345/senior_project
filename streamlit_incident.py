@@ -102,7 +102,6 @@ def data_query():
     st.write('Results')
     st.write(df_i)
     selected = st.selectbox('Select incident to view',range(1,len(df_i)+1))-1
-    path = df_i.iloc[selected ,df.columns.get_loc('path')]
     URL = df_i.iloc[selected,df.columns.get_loc('url')]
     testdrive = df_i.iloc[selected ,df.columns.get_loc('testdrive')]
     st.write('Video(drive)')
