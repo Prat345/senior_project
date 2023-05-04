@@ -202,6 +202,8 @@ def graph2(testdrive, df, incident_dict, map):
         plt.gca().add_artist(c)
     plt.scatter(df['pose.position.x'],df['pose.position.y'],color = 'lime',s = 1,label = 'Route')
     plt.scatter([],[], color= 'violet', label = 'Station')
+    plt.scatter(float(list(df['pose.position.x'])[0]),float(list(df['pose.position.y'])[0]),color = 'yellow',s = 200,marker = '^',label = 'Start') 
+    loc1 = incident_dict[testdrive]['loc1']
     loc1 = incident_dict[testdrive]['loc1']
     loc2 = incident_dict[testdrive]['loc2']
     plt.scatter(df.iloc[loc1]['pose.position.x'],df.iloc[loc1]['pose.position.y'],s=100,color = 'red',marker = '^',label = 'Condition1')
