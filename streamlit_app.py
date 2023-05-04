@@ -206,8 +206,8 @@ def graph2(testdrive, df, incident_dict, map):
     loc1 = incident_dict[testdrive]['loc1']
     loc1 = incident_dict[testdrive]['loc1']
     loc2 = incident_dict[testdrive]['loc2']
-    plt.scatter(df.iloc[loc1]['pose.position.x'],df.iloc[loc1]['pose.position.y'],s=100,color = 'red',marker = '^',label = 'Condition1')
-    plt.scatter(df.iloc[loc2]['pose.position.x'],df.iloc[loc2]['pose.position.y'],s=100,color = 'blue',marker = '^', label = 'Condition2')
+    plt.scatter(df.iloc[loc1]['pose.position.x'],df.iloc[loc1]['pose.position.y'],s=100,color = 'red',marker = '*',label = 'Condition1')
+    plt.scatter(df.iloc[loc2]['pose.position.x'],df.iloc[loc2]['pose.position.y'],s=100,color = 'blue',marker = '+', label = 'Condition2')
     plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
     plt.style.use('seaborn-whitegrid')
     st.pyplot(plt) # streamlit
