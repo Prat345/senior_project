@@ -181,7 +181,7 @@ def graph1(testdrive, df, df2, incident_dict):
     plt.vlines(x=t_auto, ymin=-h, ymax=h, colors= 'lightskyblue', ls='-', lw=1.5, label='Auto')
     plt.vlines(x=t_manual, ymin=-h, ymax=h, colors= 'peachpuff', ls='-', lw=1.5, label='Manual')
     plt.vlines(df2['Time'], ymin=-1, ymax=1, color = 'violet',label = 'Station')
-    plt.plot(df['Time'],df['linear_acceleration.x_filtered'],color = 'black',linestyle = '-',label = 'Acceleration_x',lw = 0.7)
+    plt.plot(df['Time'],df['linear_acceleration.x_filtered'],color = 'black',linestyle = '-',label = 'Acceleration_x',lw = 1)
     plt.vlines(x=con1, ymin=-h, ymax=h, colors='red', ls='-', lw=2, label='Condition1')
     plt.vlines(x=con2, ymin=-h, ymax=h, colors='blue', ls='--', lw=1.5, label='Condition2')
     # top layer
@@ -198,7 +198,7 @@ def graph2(testdrive, df, incident_dict, map):
     for index,row in map.iterrows():
         x = row['x']
         y = row['y']
-        c=plt.Circle((x, y),7.5,color = 'violet')
+        c=plt.Circle((x, y),5,color = 'violet')
         plt.gca().add_artist(c)
     plt.scatter(df['pose.position.x'],df['pose.position.y'],color = 'lime',s = 3,label = 'Route')
     plt.scatter([],[], color= 'violet', label = 'Station')
