@@ -9,8 +9,10 @@ st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
 st.title("Test drive Dashboard")
 st.markdown('#')
 
-color1 = 'turquoise'
-color2 = 'darkcyan'
+color1 = 'royalblue'
+color2 = 'darkorange'
+color3 = 'royalblue' # auto
+color4 = 'tomato' # manual
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
@@ -144,7 +146,7 @@ def mileages_stat(info):
         ax1.bar(x, y2, color=color2,width = barwidth ,label = 'mileages')
         ax1.set_ylabel("Mileages") 
 
-        ax2.plot(x, y, '-',color=color1,label = 'Auto%')
+        ax2.plot(x, y, '-',color=color1,label = 'Auto%', lw=3)
         ax1.set_xlabel("months") 
         ax2.set_ylabel("Autonomous(%)") 
         fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
@@ -158,7 +160,7 @@ def plotg(df, topic):
     plt.figure(figsize=(5,4))
     plt.xlabel("Time")  
     plt.style.use('seaborn-whitegrid')
-    plt.plot(df['Time'],df[topic],color = color2, linestyle = '-', lw=1, label = topic)
+    plt.plot(df['Time'],df[topic],color = 'black', linestyle = '-', lw=1, label = topic)
     st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
 def graph1(testdrive, df, df2, incident_dict):
@@ -176,10 +178,10 @@ def graph1(testdrive, df, df2, incident_dict):
     t_manual = gb.get_group('False')['Time']
     h = 5
     # bottom layer
-    plt.vlines(x=t_auto, ymin=-h, ymax=h, colors= color1, ls='-', lw=1.5, label='Auto')
-    plt.vlines(x=t_manual, ymin=-h, ymax=h, colors= color2, ls='-', lw=1.5, label='Manual')
-    plt.vlines(df2['Time'], ymin=-1, ymax=1, color = 'gold',label = 'Stops')
-    plt.plot(df['Time'],df['linear_acceleration.x_filtered'],color = 'black',linestyle = '-',label = 'Acceleration_x')
+    plt.vlines(x=t_auto, ymin=-h, ymax=h, colors= 'lightskyblue', ls='-', lw=1.5, label='Auto')
+    plt.vlines(x=t_manual, ymin=-h, ymax=h, colors= 'peachpuff', ls='-', lw=1.5, label='Manual')
+    plt.vlines(df2['Time'], ymin=-1, ymax=1, color = 'violet',label = 'Station')
+    plt.plot(df['Time'],df['linear_acceleration.x_filtered'],color = 'black',linestyle = '-',label = 'Acceleration_x',lw = 0.7)
     plt.vlines(x=con1, ymin=-h, ymax=h, colors='red', ls='-', lw=2, label='Condition1')
     plt.vlines(x=con2, ymin=-h, ymax=h, colors='blue', ls='--', lw=1.5, label='Condition2')
     # top layer
@@ -193,12 +195,13 @@ def graph2(testdrive, df, incident_dict, map):
     # plt.title('Plot 2')
     plt.xlabel("X coordinates")
     plt.ylabel("Y coordinates")
-    plt.scatter(df['pose.position.x'],df['pose.position.y'],color = color1,s = 3,label = 'Route')
     for index,row in map.iterrows():
         x = row['x']
         y = row['y']
-        c=plt.Circle((x, y),5,color = 'gold')
+        c=plt.Circle((x, y),7.5,color = 'violet')
         plt.gca().add_artist(c)
+    plt.scatter(df['pose.position.x'],df['pose.position.y'],color = 'lime',s = 3,label = 'Route')
+    plt.scatter([],[], color= 'violet', label = 'Station')
     loc1 = incident_dict[testdrive]['loc1']
     loc2 = incident_dict[testdrive]['loc2']
     plt.scatter(df.iloc[loc1]['pose.position.x'],df.iloc[loc1]['pose.position.y'],s=100,color = 'red',marker = '^',label = 'Condition1')
@@ -225,7 +228,7 @@ def percent_mode(df):
     df2['Percentages'] = [p_auto, p_manu]
 
     # plt.title("Percentage of driving modes")
-    plt.pie([auto,manu], labels=['Autonomous','Manual'], autopct='%1.1f%%',colors=[color1,color2])
+    plt.pie([auto,manu], labels=['Autonomous','Manual'], autopct='%1.1f%%',colors=[color3,color4])
     st.pyplot(plt) # streamlit
 
 #-----------------------------------------------------------------------------------------
