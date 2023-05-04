@@ -54,7 +54,7 @@ def barchart(df):
 #-------------------------------------------------------------------------------------------------
 # STREAMLIT
 st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
-st.header('Incident Search')
+st.header('Incident Query')
 st.markdown('#')
 df = collection.find()
 df = pd.DataFrame(df)
