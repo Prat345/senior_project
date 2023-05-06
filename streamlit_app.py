@@ -4,6 +4,7 @@ import pymongo
 from pymongo import MongoClient
 import streamlit as st
 import numpy as np
+import base64
 
 st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
 st.title("Test drive Dashboard")
@@ -262,6 +263,11 @@ def main():
         graph2(testdrive, df, incident_dict, map)
     with q3:
         percent_mode(df)
+    
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="{testdrive}.csv">Download CSV file of {testdrive}</a>'
+    st.markdown(href, unsafe_allow_html=True)  
 #-----------------------------------------------------------------------------------------
 main()
 
