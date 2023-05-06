@@ -100,7 +100,7 @@ def data_query():
     df_i.index = np.arange(1, len(df_i) + 1)
     st.markdown('#')
     st.write('Results')
-    st.write(df_i)
+    st.write(df_i[['stamp','testdrive','tags','url']])
     selected = st.selectbox('Select incident to view',range(1,len(df_i)+1))-1
     URL = df_i.iloc[selected,df.columns.get_loc('url')]
     testdrive = df_i.iloc[selected ,df.columns.get_loc('testdrive')]
