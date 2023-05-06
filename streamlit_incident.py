@@ -87,7 +87,7 @@ environment = st.multiselect('Environments',tuple(environments))
 scenario = st.multiselect('Scenarios',tuple(scenarios))
 occupant = st.multiselect('Occupants',tuple(occupants))
 system = st.multiselect('Systems',tuple(systems))
-tags = list(set(factor + actor + environment + occupant + system))
+tags = list(set(factor + actor + environment + occupant + system + scenario))
 print(tags)
 #-------------------------------------------------------------------------------------------------
 # QUERY
