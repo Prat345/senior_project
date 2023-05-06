@@ -76,7 +76,7 @@ factors = ['External','Internal']
 # EXTERNAL
 actors = ['Vehicle','Truck','Tuk-Tuk','Bus','Motorcycle','Pedestrian','Animal','Cyclist','Scooter','Non-Motor Vehicle','Other Vehicle']
 environments = ['Obstacle','Straight Road','Slope','Corner','Crosswalk','Junction','Roundabout','Speed Bump']
-scenarios = ['Cut In','Overtaking','Parking','Emergency Brake','Red Light Running','Wrong-Way Driving','Turning Across Lane','Other Scenario']
+scenarios = ['Cut In','Parking','Emergency Brake','Red Light Running','Wrong-Way Driving','Turning Across Lane','Other Scenario']
 # INTERNAL
 occupants = ['Driver','Passenger','Emergency']
 systems = ['Battery','Sensing','Localization','Planning','Computing Node']
