@@ -75,7 +75,7 @@ def boxes(testdrive,info):
     col3.metric('Date',str(df.iloc[index]['date']))
     col4.metric('Time', str(df.iloc[index]['time']))
 #-----------------------------------------------------------------------------------------
-def mileages_stat(info):
+def mileages_stat(info,n):
     df = info
     mileages_dict = {}
     gb = df.groupby(['vehicle'])
@@ -97,7 +97,7 @@ def mileages_stat(info):
     col1, col2, col3 = st.columns(3)
     col1.metric('Total Mileages(m)',str(total_mileages))
     col2.metric('Autonomous %',str(p_auto))
-    col3.metric('Test drives',str(len(info)))
+    col3.metric('Test drives',str(n))
     #-------------------------------------------------------
     q1,q2= st.columns(2,gap = 'large')
     with q1:
@@ -123,7 +123,7 @@ def mileages_stat(info):
         fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
         ax1.grid(False)
         # ax2.grid(False)
-        st.markdown('Mileages by vehicles')
+        st.markdown('Mileages by vehicle')
         ax1.set_zorder(ax2.get_zorder()+1)
         ax1.patch.set_visible(False)
         st.pyplot(plt) # streamlit
@@ -254,7 +254,8 @@ def percent_mode(df):
 #-----------------------------------------------------------------------------------------
 def main():
     info, incident_dict = information()
-    mileages_stat(info)
+    n = len(subfolders)
+    mileages_stat(info,n)
     st.markdown('#')
     selected = st.selectbox('Select testdrive',tuple(subfolders))
     st.markdown('#')
