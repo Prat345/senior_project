@@ -255,7 +255,7 @@ def percent_mode(df):
 def main():
     info, incident_dict = information()
     n = len(subfolders)
-#     mileages_stat(info,n)
+    mileages_stat(info,n)
     st.markdown('#')
     selected = st.selectbox('Select testdrive',tuple(subfolders))
     st.markdown('#')
