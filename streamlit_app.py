@@ -123,7 +123,7 @@ def mileages_stat(info):
         fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
         ax1.grid(False)
         # ax2.grid(False)
-        st.markdown('Mileages Statistics')
+        st.markdown('Mileages by vehicles')
         ax1.set_zorder(ax2.get_zorder()+1)
         ax1.patch.set_visible(False)
         st.pyplot(plt) # streamlit
@@ -169,7 +169,7 @@ def mileages_stat(info):
         fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
         ax1.grid(False)
         # ax2.grid(False)
-        st.markdown('Autonomous Percentage Monthly')
+        st.markdown('Mileages Monthly')
         ax1.set_zorder(ax2.get_zorder()+1)
         ax1.patch.set_visible(False)
         st.pyplot(plt)
