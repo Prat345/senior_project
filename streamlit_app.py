@@ -6,6 +6,7 @@ import streamlit as st
 import numpy as np
 import base64
 
+@st.cache_data(experimental_allow_widgets=True)
 st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
 st.title("Test drive Dashboard")
 st.markdown('#')
