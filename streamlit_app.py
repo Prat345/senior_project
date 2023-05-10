@@ -1,3 +1,4 @@
+# APP V1
 import pandas as pd
 import matplotlib.pyplot as plt
 import pymongo
@@ -14,7 +15,6 @@ color1 = 'royalblue'
 color2 = 'darkorange'
 color3 = 'royalblue' # auto
 color4 = 'tomato' # manual
-color5 = 'lime' # mileages
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
@@ -41,7 +41,7 @@ def information():
     incident_dict = incident_col.find_one()
     info_col = db2['Testdrive_info']
     info = info_col.find()
-    info = pd.DataFrame(info, dtype = 'float64') 
+    info = pd.DataFrame(info, dtype = 'float64')
     info = info.drop(columns = ['_id','Unnamed: 0'])
     # st.header('Testdrives Information')
     # st.write(info)
@@ -75,68 +75,61 @@ def boxes(testdrive,info):
     col3.metric('Date',str(df.iloc[index]['date']))
     col4.metric('Time', str(df.iloc[index]['time']))
 #-----------------------------------------------------------------------------------------
-def mileages_stat(info,n):
+def mileages_stat(info):
     df = info
     mileages_dict = {}
     gb = df.groupby(['vehicle'])
-    auto_dict = {}
     for vehicle in ['T1','T2-B','T2-W']:
         mileages_dict[vehicle] = gb.get_group(vehicle)['mileages'].sum(axis=0)
-        temp = gb.get_group(vehicle)
-        auto = (temp['p_auto'] * temp['mileages']).sum(axis=0)/temp['mileages'].sum(axis=0)
-        auto_dict[vehicle] = auto.sum(axis=0)
     vehicles = list(mileages_dict.keys())
-    mileages_list = list(mileages_dict.values())
-    auto_list = list(auto_dict.values())
-    manual_list = [100-float(i) for i in auto_list]
+    mileages = list(mileages_dict.values())
+    auto_dict = {}
+    for vehicle in ['T1','T2-B','T2-W']:
+        auto = gb.get_group(vehicle)['mileages'] * gb.get_group(vehicle)['p_auto']/100
+        auto_dict[vehicle] = auto.sum(axis=0)
+    auto = list(auto_dict.values())
     #-------------------------------------------------------
-    total_mileages = round(df['mileages'].sum(axis=0),2)
-    df['auto_mileages'] = df['mileages'] * df['p_auto']/100
-    p_auto = df['auto_mileages'].sum(axis=0)/total_mileages * 100
-    p_auto = round(p_auto,2)
+    total_mileages = round(sum(mileages),2)
+    total_auto = round(sum(auto),2)
+    p_auto = round(total_auto/total_mileages*100,2)
     col1, col2, col3 = st.columns(3)
     col1.metric('Total Mileages(m)',str(total_mileages))
     col2.metric('Autonomous %',str(p_auto))
-    col3.metric('Test drives',str(n))
+    col3.metric('Test drives',str(len(info)))
     #-------------------------------------------------------
     q1,q2= st.columns(2,gap = 'large')
     with q1:
-        fig, ax1 = plt.subplots(figsize=(5,4))
-        plt.style.use('seaborn-whitegrid')
-        ax2 = ax1.twinx()
-        ax1.set_ylim(0,round(max(mileages_list),-3)+4000)
-        ax2.set_ylim(0,100)
+        fig = plt.subplots(figsize = (5,4))
         barwidth = 0.4
-        ax1.plot(vehicles, mileages_list, color = color5, lw = 3, label = 'Total Mileages')
-        for i, v in enumerate(mileages_list):
-            ax1.text(float(i)-.3 , float(v)+300, str(round(v))+' m', color='black', fontweight='bold')
+        x1 = np.arange(len(mileages))
+        x2 = [i + barwidth for i in x1]
+        plt.bar(x1, mileages, color = color2,width = barwidth, label = 'Total Mileages')
+        for i, v in enumerate(mileages):
+            plt.text(float(i)-.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
         #----------------------------------------------------
-        ax2.bar(vehicles, auto_list, width = barwidth, color=color3, label = 'Auto%')
-        ax2.bar(vehicles, manual_list, bottom = auto_list, width = barwidth, color=color4, label = 'Manual%')
-        for i, v in enumerate(auto_list):
-            ax2.text(float(i)-.15 , float(v)/2, str(round(v,2))+'%', color='white', fontweight='light')
-            ax2.text(float(i)-.15 , float(manual_list[i])/2+float(v), str(round(manual_list[i],2))+ '%', color='white', fontweight='light')
+        plt.bar(x2, auto, color = color1,width = barwidth, label = 'Autonomous')
+        for i, v in enumerate(auto):
+            plt.text(float(i)+.2 , float(v)+100, str(round(v,2)), color='black', fontweight='light')
         #----------------------------------------------------
-        ax1.set_ylabel("Mileages(m)") 
-        ax1.set_xlabel("Vehicles") 
-        ax2.set_ylabel("Autonomous(%)") 
-        fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
-        ax1.grid(False)
-        # ax2.grid(False)
-        st.markdown('Mileages by vehicle')
-        ax1.set_zorder(ax2.get_zorder()+1)
-        ax1.patch.set_visible(False)
+        plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left')
+        plt.xticks([r + barwidth/2 for r in range(len(vehicles))],vehicles)
+        plt.ylim(0,round(max(mileages),-3)+2000)
+        plt.xlabel("Vehicle") 
+        plt.ylabel("mileages(m)") 
+        # plt.style.use('seaborn-whitegrid')
+        st.markdown('Mileages Statistics')
         st.pyplot(plt) # streamlit
     #----------------------------------------------------
     with q2:
         df['month'] = df['date'].str[:-3]
+        df['p'] = df['mileages'] * df['p_auto']/100
         # p = df['mileages'] * df['p_auto']
         gb = df.groupby('month')
         month_list = list(gb.groups.keys())
         auto_dict = {}
         mileages_dict = {}
         for m in month_list:
-            a = gb.get_group(m)['auto_mileages'].sum(axis=0)
+            a = gb.get_group(m)['p'].sum(axis=0)
             d = gb.get_group(m)['mileages'].sum(axis=0)
             ans = round(a/d*100,2)
             auto_dict[m] = ans
@@ -146,32 +139,22 @@ def mileages_stat(info,n):
         plt.style.use('seaborn-whitegrid')
         ax2 = ax1.twinx()
         
-        month_list = list(auto_dict.keys())
-        auto_list = list(auto_dict.values())
-        manual_list = [100-float(i) for i in auto_list]
-        mileages_list = list(mileages_dict.values())
+        x = auto_dict.keys()
+        y = auto_dict.values()
+        y2 = mileages_dict.values()
 
-        ax1.set_ylim(0,round(max(mileages_list),-3)+4000)
+        ax1.set_ylim(0,round(max(y2),-3)+2000)
         ax2.set_ylim(0,100)
+        ax1.bar(x, y2, color=color2,width = barwidth ,label = 'mileages')
+        ax1.set_ylabel("Mileages") 
 
-        ax2.bar(month_list, auto_list, width = barwidth, color=color3, label = 'Auto%')
-        ax2.bar(month_list, manual_list, bottom = auto_list, width = barwidth, color=color4, label = 'Manual%')
-        ax1.plot(month_list, mileages_list, color=color5,lw = 3,label = 'Total Mileages')
-        for i, v in enumerate(mileages_list):
-            ax1.text(float(i)-.3 , float(v)+300, str(round(v))+' m', color='black', fontweight='bold')
-        for i, v in enumerate(auto_list):
-            ax2.text(float(i)-.15 , float(v)/2, str(round(v,2))+'%', color='white', fontweight='light')
-            ax2.text(float(i)-.15 , float(manual_list[i])/2+float(v), str(round(manual_list[i],2))+ '%', color='white', fontweight='light')
-
-        ax1.set_ylabel("Mileages(m)") 
-        ax1.set_xlabel("Months") 
+        ax2.plot(x, y, '-',color=color1,label = 'Auto%', lw=3)
+        ax1.set_xlabel("months") 
         ax2.set_ylabel("Autonomous(%)") 
         fig.legend(bbox_to_anchor=(1.0, 0.9), loc='upper left')
-        ax1.grid(False)
-        # ax2.grid(False)
-        st.markdown('Mileages Monthly')
-        ax1.set_zorder(ax2.get_zorder()+1)
-        ax1.patch.set_visible(False)
+        # ax1.grid(False)
+        ax2.grid(False)
+        st.markdown('Autonomous Percentage Monthly')
         st.pyplot(plt)
 #-----------------------------------------------------------------------------------------
 def plotg(df, topic):
@@ -221,7 +204,8 @@ def graph2(testdrive, df, incident_dict, map):
         plt.gca().add_artist(c)
     plt.scatter(df['pose.position.x'],df['pose.position.y'],color = 'lime',s = 1,label = 'Route')
     plt.scatter([],[], color= 'violet', label = 'Station')
-    plt.scatter(float(list(df['pose.position.x'])[0]),float(list(df['pose.position.y'])[0]),color = 'gold',s = 100,marker = '^',label = 'Start') 
+    plt.scatter(float(list(df['pose.position.x'])[0]),float(list(df['pose.position.y'])[0]),color = 'yellow',s = 200,marker = '^',label = 'Start') 
+    loc1 = incident_dict[testdrive]['loc1']
     loc1 = incident_dict[testdrive]['loc1']
     loc2 = incident_dict[testdrive]['loc2']
     plt.scatter(df.iloc[loc1]['pose.position.x'],df.iloc[loc1]['pose.position.y'],s=100,color = 'red',marker = '*',label = 'Condition1')
@@ -254,8 +238,7 @@ def percent_mode(df):
 #-----------------------------------------------------------------------------------------
 def main():
     info, incident_dict = information()
-    n = len(subfolders)
-    mileages_stat(info,n)
+    mileages_stat(info)
     st.markdown('#')
     selected = st.selectbox('Select testdrive',tuple(subfolders))
     st.markdown('#')
@@ -281,12 +264,11 @@ def main():
         graph2(testdrive, df, incident_dict, map)
     with q3:
         percent_mode(df)
-
+    
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
     href = f'<a href="data:file/csv;base64,{b64}" download="{testdrive}.csv">Download CSV file of {testdrive}</a>'
     st.markdown(href, unsafe_allow_html=True)  
-    
 #-----------------------------------------------------------------------------------------
 main()
 
