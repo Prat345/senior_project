@@ -18,7 +18,7 @@ color2 = 'darkorange'
 color3 = 'royalblue' # auto
 color4 = 'limegreen' # manual
 color5 = 'violet'
-with open('style2.css') as f:
+with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # RETRIEVE DATA FROM DB
