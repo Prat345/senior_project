@@ -115,8 +115,6 @@ def data_query():
     queries = collection.find({key:{"$all":value}})
     df_i = pd.DataFrame(queries)
     df_i.index = np.arange(1, len(df_i) + 1)
-    st.markdown('#')
-    st.header('Results')
     st.write(df_i[['stamp','testdrive','tags','url']])
     selected = st.selectbox('Select incident number',range(1,len(df_i)+1))-1
     path = df_i.iloc[selected ,df.columns.get_loc('path')]
@@ -135,6 +133,9 @@ def data_query():
     st.write('CSV(db)')
     st.markdown(href, unsafe_allow_html=True)       
     #-------------------------------------------------------------------------------------------------
+    
+st.markdown('#')
+st.header('Results')
 if tags !=[]:
     data_query()
 
