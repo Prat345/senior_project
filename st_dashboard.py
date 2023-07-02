@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import pygal
 import pymongo
 from pymongo import MongoClient
 import streamlit as st
