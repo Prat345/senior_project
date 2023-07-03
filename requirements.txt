@@ -1,5 +1,6 @@
 streamlit==1.22.0
 pandas==1.5.2
 matplotlib==3.6.3
+plotly==5.15.0
 numpy==1.24.1
-pymongo
+pymongo==4.3.3
