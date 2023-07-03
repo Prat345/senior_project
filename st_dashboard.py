@@ -7,6 +7,9 @@ import numpy as np
 import base64
 from datetime import datetime
 import matplotlib.dates as mdates
+import plotly.express as px
+from plotly.subplots import make_subplots
+import plotly.graph_objs as go
 
 # st.cache(hash_funcs={"MyUnhashableClass": lambda _: None})
 st.set_page_config(page_title="Senior Project", page_icon="*", layout="wide")
@@ -101,9 +104,9 @@ def mileages_stat(info,n):
     p_auto = df['auto_mileages'].sum(axis=0)/total_mileages * 100
     p_auto = round(p_auto,2)
     col1, col2, col3 = st.columns(3)
-    col1.metric('Total Mileages',str(total_mileages) + ' m', delta=+2512.07, delta_color="normal")
-    col2.metric('Average Autonomous %',str(p_auto)+ '%', delta=-3.71, delta_color="normal")
-    col3.metric('Total Test drives',str(n))
+    col1.metric('Total Test drives',str(n), delta=+2, delta_color="normal")
+    col2.metric('Total Mileages',str(total_mileages) + ' m', delta=+2512.07, delta_color="normal")
+    col3.metric('Average Autonomous %',str(p_auto)+ '%', delta=-3.71, delta_color="normal")
     #-------------------------------------------------------
     q1,q2= st.columns(2,gap = 'large')
     with q1:
@@ -122,9 +125,13 @@ def mileages_stat(info,n):
             ax2.text(float(i)-.15 , float(v)/2, str(round(v,2))+'%', color='white', fontweight='light')
             ax2.text(float(i)-.15 , float(manual_list[i])/2+float(v), str(round(manual_list[i],2))+ '%', color='white', fontweight='light')
         #----------------------------------------------------
-        ax1.set_ylabel("Mileages(m)") 
+        ax1.set_ylabel(r"Mileages $(m)$", color=color2)
+        for label in ax1.get_yticklabels():
+            label.set_color(color2)
         ax1.set_xlabel("Vehicles") 
-        ax2.set_ylabel("Autonomous(%)") 
+        ax2.set_ylabel("Autonomous (%)", color=color1)
+        for label in ax2.get_yticklabels():
+            label.set_color(color1)
         fig.legend(bbox_to_anchor=(0.5, 0.9), loc='lower center', ncol = 3, fancybox = True)
         ax1.grid(False)
         ax2.grid(True)
@@ -167,9 +174,13 @@ def mileages_stat(info,n):
             ax2.text(float(i)-.15 , float(v)/2, str(round(v,2))+'%', color='white', fontweight='light')
             ax2.text(float(i)-.15 , float(manual_list[i])/2+float(v), str(round(manual_list[i],2))+ '%', color='white', fontweight='light')
 
-        ax1.set_ylabel("Mileages(m)") 
+        ax1.set_ylabel(r"Mileages $(m)$", color=color2)
+        for label in ax1.get_yticklabels():
+            label.set_color(color2)
         ax1.set_xlabel("Months") 
-        ax2.set_ylabel("Autonomous(%)") 
+        ax2.set_ylabel("Autonomous (%)", color=color1)
+        for label in ax2.get_yticklabels():
+            label.set_color(color1)
         fig.legend(bbox_to_anchor=(0.5, 0.9), loc='lower center', ncol = 3, fancybox = True)
         ax1.grid(False)
         ax2.grid(True)
@@ -241,18 +252,26 @@ def graph2(testdrive, df, incident_dict, map):
     plt.style.use('seaborn-whitegrid')
     st.pyplot(plt) # streamlit
 #-----------------------------------------------------------------------------------------
-def percent_mode(df):
+def pie_chart(df):
     st.markdown("Autonomous Percentage")
-    plt.figure(figsize=(4,4), dpi=200)
     df['delta_x'] = df['pose.position.x'].diff()
     df['delta_y'] = df['pose.position.y'].diff()
     df['distance'] = (df['delta_x']**2 + df['delta_y']**2)**0.5
     auto = df[df['msg.mode'] == 'True']['distance'].sum(axis=0)
     d = df['distance'].sum(axis=0)
     auto = round(auto,2); d = round(d,2); manu = round(d-auto,2)
-    plt.pie([auto,manu], labels=['Autonomous','Manual'], autopct='%1.1f%%',colors=[color3,color4])
-    st.pyplot(plt) # streamlit
 
+    fig = px.pie(names=['Auto','Manual'],values=[auto,manu], height=300, width=300, hole=0.7, 
+                    color_discrete_sequence=[color3,color4])
+    fig.update_traces(hovertemplate=None, textposition='outside',textinfo='percent+label', rotation=50)
+    fig.update_layout(margin=dict(t=50, b=35, l=0, r=0), showlegend=False,
+                            font=dict(size=17, color='#8a8d93'),
+                            hoverlabel=dict(bgcolor="#444", font_size=10, font_family="Lato, sans-serif"))
+    fig.add_annotation(dict(x=0.5, y=0.5,  align='center',
+                            xref = "paper", yref = "paper",
+                            showarrow = False, font_size=20,
+                            text="Drive Mode"))
+    st.plotly_chart(fig)
 #-----------------------------------------------------------------------------------------
 def main():
     info, incident_dict = information()
@@ -271,9 +290,9 @@ def main():
     st.markdown('#')
     q1,q2,q3,q4 = st.columns(4,gap = 'large')
     with q1:
-        plotg(df,'Velocity_x', 'twist.linear.x', 'Velocity(m/s)')
+        plotg(df,'Velocity_x', 'twist.linear.x', r'Velocity &(m/s)&')
     with q2:
-        plotg(df,'Acceleration_x', 'linear_acceleration.x_filtered', 'Acceleration(m/s^2)')
+        plotg(df,'Acceleration_x', 'linear_acceleration.x_filtered', r'Acceleration $(m/s^2)$')
     with q3:
         df['percent_brake'] = df['msg.brake']/250*100
         plotg(df,'Brake Input', 'percent_brake', 'Brake%')
@@ -286,7 +305,7 @@ def main():
     with q2:
         graph2(testdrive, df, incident_dict, map)
     with q3:
-        percent_mode(df)
+        pie_chart(df)
     
     @st.cache_data 
     def convert_df(df):
@@ -294,9 +313,7 @@ def main():
         return df.to_csv(index=False).encode('utf-8')
     csv = convert_df(df)
     st.download_button(label="Download CSV", data=csv, file_name=f'{testdrive}.csv', mime='csv')
-    
 #-----------------------------------------------------------------------------------------
 main()
-
 url = 'https://seniorproject-incident-query.streamlit.app/'
 st.write(f"Go to Incident Query [link]({url})")
