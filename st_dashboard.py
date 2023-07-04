@@ -84,110 +84,64 @@ def boxes(testdrive,info):
     col3.metric('Date',date)
     col4.metric('Time', str(df.iloc[index]['time']))
 #-----------------------------------------------------------------------------------------
-def mileages_stat(info,n):
-    df = info
-    mileages_dict = {}
-    gb = df.groupby(['vehicle'])
-    auto_dict = {}
-    for vehicle in ['T1','T2-B','T2-W']:
-        mileages_dict[vehicle] = gb.get_group(vehicle)['mileages'].sum(axis=0)
-        temp = gb.get_group(vehicle)
-        auto = (temp['p_auto'] * temp['mileages']).sum(axis=0)/temp['mileages'].sum(axis=0)
-        auto_dict[vehicle] = auto.sum(axis=0)
-    vehicles = list(mileages_dict.keys())
-    mileages_list = list(mileages_dict.values())
-    auto_list = list(auto_dict.values())
-    manual_list = [100-float(i) for i in auto_list]
-    #-------------------------------------------------------
+def sort_by(df, var, title):
+    df['d_auto'] = df['mileages']*df['p_auto']/100
+    by_var = df.groupby(var)
+    variables = by_var.groups.keys()
+    by_var = by_var.sum()
+    by_var['p_auto'] = by_var['d_auto']/by_var['mileages']*100
+    # st.write(by_var)
+    mileages_list = by_var['mileages']
+    auto_list = by_var['p_auto']
+    manual_list = 100-by_var['p_auto']
+
+    fig, ax1 = plt.subplots(figsize=(5,4), dpi=200)
+    ax2 = ax1.twinx()
+    ax1.set_ylim(0,round(max(mileages_list),-3)+4000)
+    ax2.set_ylim(0,100)
+    barwidth = 0.4
+    ax1.plot(variables, mileages_list, color = color2, lw = 3, marker = '^',markeredgecolor = 'black',label = 'Total Mileages')
+    for i, v in enumerate(mileages_list):
+        ax1.text(float(i)-.3 , float(v)+300, str(round(v))+' m', color='black', fontweight='bold')
+    #----------------------------------------------------
+    ax2.bar(variables, auto_list, width = barwidth, color=color3, label = 'Auto%')
+    ax2.bar(variables, manual_list, bottom = auto_list, width = barwidth, color=color4, label = 'Manual%')
+    for i, v in enumerate(auto_list):
+        ax2.text(float(i)-.15 , float(v)/2, str(round(v,2))+'%', color='white', fontweight='light')
+        ax2.text(float(i)-.15 , float(manual_list[i])/2+float(v), str(round(manual_list[i],2))+ '%', color='white', fontweight='light')
+    #----------------------------------------------------
+    ax1.set_ylabel(r"Mileages $(m)$", color=color2)
+    for label in ax1.get_yticklabels():
+        label.set_color(color2)
+    ax1.set_xlabel(title) 
+    ax2.set_ylabel("Autonomous (%)", color=color1)
+    for label in ax2.get_yticklabels():
+        label.set_color(color1)
+    fig.legend(bbox_to_anchor=(0.5, 0.9), loc='lower center', ncol = 3, fancybox = True)
+    ax1.grid(False)
+    ax2.grid(True)
+    st.markdown(f'Mileages by {title}')
+    ax1.set_zorder(ax2.get_zorder()+1)
+    ax1.patch.set_visible(False)
+    st.pyplot(plt) # streamlit
+    
+#-----------------------------------------------------------------------------------------
+def mileages_stat(df,n):
     total_mileages = round(df['mileages'].sum(axis=0),2)
-    df['auto_mileages'] = df['mileages'] * df['p_auto']/100
-    p_auto = df['auto_mileages'].sum(axis=0)/total_mileages * 100
+    d_auto = df['mileages'] * df['p_auto']/100
+    p_auto = d_auto.sum(axis=0)/total_mileages * 100
     p_auto = round(p_auto,2)
     col1, col2, col3 = st.columns(3)
     col1.metric('Total Test drives',str(n), delta=+2, delta_color="normal")
     col2.metric('Total Mileages',str(total_mileages) + ' m', delta=+2512.07, delta_color="normal")
     col3.metric('Average Autonomous %',str(p_auto)+ '%', delta=-3.71, delta_color="normal")
-    #-------------------------------------------------------
+
     q1,q2= st.columns(2,gap = 'large')
     with q1:
-        fig, ax1 = plt.subplots(figsize=(5,4), dpi=200)
-        ax2 = ax1.twinx()
-        ax1.set_ylim(0,round(max(mileages_list),-3)+4000)
-        ax2.set_ylim(0,100)
-        barwidth = 0.4
-        ax1.plot(vehicles, mileages_list, color = color2, lw = 3, marker = '^',markeredgecolor = 'black',label = 'Total Mileages')
-        for i, v in enumerate(mileages_list):
-            ax1.text(float(i)-.3 , float(v)+300, str(round(v))+' m', color='black', fontweight='bold')
-        #----------------------------------------------------
-        ax2.bar(vehicles, auto_list, width = barwidth, color=color3, label = 'Auto%')
-        ax2.bar(vehicles, manual_list, bottom = auto_list, width = barwidth, color=color4, label = 'Manual%')
-        for i, v in enumerate(auto_list):
-            ax2.text(float(i)-.15 , float(v)/2, str(round(v,2))+'%', color='white', fontweight='light')
-            ax2.text(float(i)-.15 , float(manual_list[i])/2+float(v), str(round(manual_list[i],2))+ '%', color='white', fontweight='light')
-        #----------------------------------------------------
-        ax1.set_ylabel(r"Mileages $(m)$", color=color2)
-        for label in ax1.get_yticklabels():
-            label.set_color(color2)
-        ax1.set_xlabel("Vehicles") 
-        ax2.set_ylabel("Autonomous (%)", color=color1)
-        for label in ax2.get_yticklabels():
-            label.set_color(color1)
-        fig.legend(bbox_to_anchor=(0.5, 0.9), loc='lower center', ncol = 3, fancybox = True)
-        ax1.grid(False)
-        ax2.grid(True)
-        st.markdown('Mileages by vehicle')
-        ax1.set_zorder(ax2.get_zorder()+1)
-        ax1.patch.set_visible(False)
-        st.pyplot(plt) # streamlit
-    #----------------------------------------------------
+        sort_by(df,'vehicle','Vehicles')
     with q2:
-        df['month'] = df['date'].str[:-3]
-        # p = df['mileages'] * df['p_auto']
-        gb = df.groupby('month')
-        month_list = list(gb.groups.keys())
-        auto_dict = {}
-        mileages_dict = {}
-        for m in month_list:
-            a = gb.get_group(m)['auto_mileages'].sum(axis=0)
-            d = gb.get_group(m)['mileages'].sum(axis=0)
-            ans = round(a/d*100,2)
-            auto_dict[m] = ans
-            mileages_dict[m] = d
-            
-        fig, ax1 = plt.subplots(figsize=(5,4), dpi=200)
-        ax2 = ax1.twinx()
-        
-        month_list = list(auto_dict.keys())
-        auto_list = list(auto_dict.values())
-        manual_list = [100-float(i) for i in auto_list]
-        mileages_list = list(mileages_dict.values())
-
-        ax1.set_ylim(0,round(max(mileages_list),-3)+4000)
-        ax2.set_ylim(0,100)
-
-        ax2.bar(month_list, auto_list, width = barwidth, color=color3, label = 'Auto%')
-        ax2.bar(month_list, manual_list, bottom = auto_list, width = barwidth, color=color4, label = 'Manual%')
-        ax1.plot(month_list, mileages_list, color=color2,lw = 3,marker = '^',markeredgecolor = 'black',label = 'Total Mileages')
-        for i, v in enumerate(mileages_list):
-            ax1.text(float(i)-.3 , float(v)+300, str(round(v))+' m', color='black', fontweight='bold')
-        for i, v in enumerate(auto_list):
-            ax2.text(float(i)-.15 , float(v)/2, str(round(v,2))+'%', color='white', fontweight='light')
-            ax2.text(float(i)-.15 , float(manual_list[i])/2+float(v), str(round(manual_list[i],2))+ '%', color='white', fontweight='light')
-
-        ax1.set_ylabel(r"Mileages $(m)$", color=color2)
-        for label in ax1.get_yticklabels():
-            label.set_color(color2)
-        ax1.set_xlabel("Months") 
-        ax2.set_ylabel("Autonomous (%)", color=color1)
-        for label in ax2.get_yticklabels():
-            label.set_color(color1)
-        fig.legend(bbox_to_anchor=(0.5, 0.9), loc='lower center', ncol = 3, fancybox = True)
-        ax1.grid(False)
-        ax2.grid(True)
-        st.markdown('Mileages by Month')
-        ax1.set_zorder(ax2.get_zorder()+1)
-        ax1.patch.set_visible(False)
-        st.pyplot(plt)
+        df['month'] = pd.to_datetime(df['date']).apply(lambda date: date.strftime('%y-%m'))
+        sort_by(df,'month','Months')
 #-----------------------------------------------------------------------------------------
 def plotg(df,title, topic, y_label):
     st.markdown(f"{title}")
