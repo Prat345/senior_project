@@ -101,8 +101,8 @@ def sort_by(df, var, title):
     ax2.set_ylim(0,100)
     barwidth = 0.4
     ax1.plot(variables, mileages_list, color = color2, lw = 3, marker = '^',markeredgecolor = 'black',label = 'Total Mileages')
-    for i, v in enumerate(mileages_list):
-        ax1.text(float(i)-.3 , float(v)+300, str(round(v))+' m', color='black', fontweight='bold')
+    # for i, v in enumerate(mileages_list):
+    #     ax1.text(float(i)-.3 , float(v)+300, str(round(v))+' m', color='black', fontweight='bold')
     #----------------------------------------------------
     ax2.bar(variables, auto_list, width = barwidth, color=color3, label = 'Auto%')
     ax2.bar(variables, manual_list, bottom = auto_list, width = barwidth, color=color4, label = 'Manual%')
