@@ -411,7 +411,7 @@ def waypoint_chart(data,incident_d,testdrive):
 
 # Run app
 if __name__=='__main__':
-    app.run_server(debug=True, port=8054)
+    app.run_server(debug=False, port=8054)
 
 # ref
 # https://dashcheatsheet.pythonanywhere.com/
