@@ -1,0 +1,6 @@
+pymongo==4.3.3
+dash==2.11.1
+dash-bootstrap-components==1.4.2
+numpy==1.24.1
+matplotlib==3.6.3
+pandas==1.5.3
