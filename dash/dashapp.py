@@ -34,7 +34,7 @@ avg_auto = round(avg_auto,1)
 map = pd.read_csv('station.csv', index_col=['location','vehicle','index'], skipinitialspace=True)
 topics = ['twist.linear.x','linear_acceleration.x_filtered', 'msg.brake', 'mileages']
 
-fig0 = px.bar(info.dropna(subset='mileages'), x='testdrive', y='mileages',
+fig0 = px.bar(info_sort[info_sort['mileages'].notna()], x='testdrive', y='mileages',
              hover_data=['p_auto', 'p_manual'], color='p_auto',
              labels={'pop':'population of Canada'}, height=300, 
              text_auto='.2s',
