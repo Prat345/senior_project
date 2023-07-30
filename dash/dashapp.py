@@ -47,6 +47,7 @@ fig0.update_layout(margin=dict(l=0, r=10, t=0, b=0),
 # Components
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],
             meta_tags=[{'name':' viewport', 'content': 'width=device-width, initial-scale=0.1'}])
+server = app.server
 bar_testdrive = dcc.Graph(figure=fig0)
 pie_mileage = dcc.Graph(id='pie1',figure={})
 hist_mode = dcc.Graph(id='hist1',figure={})
