@@ -1,5 +1,5 @@
 numpy
-pandas==1.5.3
+pandas
 plotly==5.15.0
 dash==2.11.1
 dash-bootstrap-components==1.4.2
