@@ -34,21 +34,21 @@ avg_auto = round(avg_auto,1)
 map = pd.read_csv('station.csv', index_col=['location','vehicle','index'], skipinitialspace=True)
 topics = ['twist.linear.x','linear_acceleration.x_filtered', 'msg.brake', 'mileages']
 
-fig0 = px.bar(info.dropna(subset='mileages'), x='testdrive', y='mileages',
-             hover_data=['p_auto', 'p_manual'], color='p_auto',
-             labels={'pop':'population of Canada'}, height=300, 
-             text_auto='.2s',
-             color_continuous_scale='viridis_r')
-fig0.update_traces(textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
-fig0.update_layout(margin=dict(l=0, r=10, t=0, b=0),
-                   yaxis_range=[0, max(info['mileages'])*1.2])
+# fig0 = px.bar(info.dropna(subset='mileages'), x='testdrive', y='mileages',
+#              hover_data=['p_auto', 'p_manual'], color='p_auto',
+#              labels={'pop':'population of Canada'}, height=300, 
+#              text_auto='.2s',
+#              color_continuous_scale='viridis_r')
+# fig0.update_traces(textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
+# fig0.update_layout(margin=dict(l=0, r=10, t=0, b=0),
+#                    yaxis_range=[0, max(info['mileages'])*1.2])
 
 #-------------------------------------------------------------------------------------------------------
 # Components
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],
             meta_tags=[{'name':' viewport', 'content': 'width=device-width, initial-scale=0.1'}])
 server = app.server
-bar_testdrive = dcc.Graph(figure=fig0)
+bar_testdrive = dcc.Graph(figure={})
 pie_mileage = dcc.Graph(id='pie1',figure={})
 hist_mode = dcc.Graph(id='hist1',figure={})
 
