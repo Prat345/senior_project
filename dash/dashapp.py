@@ -31,7 +31,7 @@ avg_auto = (info['p_auto']*info['mileages']).sum()/info['mileages'].sum()
 avg_auto = round(avg_auto,1)
 # testdrives = os.listdir('D:\FOOH\Senior_Project/testdrives')
 # info = pd.read_csv(f'D:\FOOH\Senior_Project/testdrive_info.csv')
-map = pd.read_csv('D:\FOOH\Senior_Project\station.csv', index_col=['location','vehicle','index'], skipinitialspace=True)
+map = pd.read_csv('station.csv', index_col=['location','vehicle','index'], skipinitialspace=True)
 topics = ['twist.linear.x','linear_acceleration.x_filtered', 'msg.brake', 'mileages']
 
 fig0 = px.bar(info.dropna(subset='mileages'), x='testdrive', y='mileages',
