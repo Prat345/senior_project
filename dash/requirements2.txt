@@ -1,3 +1,4 @@
+python==3.9.17
 numpy
 pandas
 plotly==5.15.0
