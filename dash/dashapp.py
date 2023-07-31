@@ -261,10 +261,18 @@ def parameter_chart(data,incident_d,topic):
     df = pd.DataFrame(data)
     df['elasped_time'] = df['elasped_time'].apply(lambda t: t[3:])
     # print(incident_d)
-    con1 = pd.Series(incident_d['loc1'])
-    con2 = pd.Series(incident_d['loc2'])
-    t_con1 = df.iloc[con1]['elasped_time']
-    t_con2 = df.iloc[con2]['elasped_time']
+    # con1 = pd.Series(incident_d['loc1'])
+    # con2 = pd.Series(incident_d['loc2'])
+    # t_con1 = df.iloc[con1]['elasped_time']
+    # t_con2 = df.iloc[con2]['elasped_time']
+    t_con1 = []
+    t_con2 = []
+    if len(incident_d['loc1']) > 0:
+        con1 = pd.Series(incident_d['loc1'])
+        t_con1 = df.iloc[con1]['elasped_time']
+    if len(incident_d['loc2']) > 0:
+        con1 = pd.Series(incident_d['loc2'])
+        t_con1 = df.iloc[con1]['elasped_time']
 
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, row_heights=[0.1,0.8,0.1])
     if topic == 'mileages':
@@ -362,9 +370,14 @@ def waypoint_chart(data,incident_d,testdrive):
     testdrive = testdrive.replace('Chula','CU')
     vehicle,operator,location,date = testdrive.split('_')
     submap = map.loc[location].loc[vehicle]
-
-    con1 = pd.Series(incident_d['loc1'])
-    con2 = pd.Series(incident_d['loc2'])
+    # con1 = pd.Series(incident_d['loc1'])
+    # con2 = pd.Series(incident_d['loc2'])
+    con1 = []
+    con2 = []
+    if len(incident_d['loc1']) > 0:
+        con1 = pd.Series(incident_d['loc1'])
+    if len(incident_d['loc2']) > 0:
+        con2 = pd.Series(incident_d['loc2'])
 
     if 'NBTC' in testdrive.upper():
         tick = 20
