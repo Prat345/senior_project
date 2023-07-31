@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc    # pip install dash-bootstrap-componen
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import pandas as pd                    
+import pandas as pd                       
 import numpy as np
 import os
 import pymongo
@@ -29,12 +29,10 @@ info.drop(columns = ['_id','Unnamed: 0'],inplace=True)
 info_sort = info.sort_values(by=['datetime'])
 avg_auto = (info['p_auto']*info['mileages']).sum()/info['mileages'].sum()
 avg_auto = round(avg_auto,1)
-# testdrives = os.listdir('D:\FOOH\Senior_Project/testdrives')
-# info = pd.read_csv(f'D:\FOOH\Senior_Project/testdrive_info.csv')
 map = pd.read_csv('station.csv', index_col=['location','vehicle','index'], skipinitialspace=True)
 topics = ['twist.linear.x','linear_acceleration.x_filtered', 'msg.brake', 'mileages']
 
-fig0 = px.bar(info_sort[info_sort['mileages'].notna()], x='testdrive', y='mileages',
+fig0 = px.bar(info.dropna(subset='mileages'), x='testdrive', y='mileages',
              hover_data=['p_auto', 'p_manual'], color='p_auto',
              labels={'pop':'population of Canada'}, height=300, 
              text_auto='.2s',
@@ -52,14 +50,14 @@ bar_testdrive = dcc.Graph(figure=fig0)
 pie_mileage = dcc.Graph(id='pie1',figure={})
 hist_mode = dcc.Graph(id='hist1',figure={})
 
-testdrive_name = dcc.Markdown(children='Viewing '+'T2-B_SL_NBTC_20230125202407')
+testdrive_name = dcc.Markdown(children='Viewing '+testdrives[0])
 para_chart = dcc.Graph(id='para_chart',figure={})
 wp_chart = dcc.Graph(id='wp_chart',figure={})
 dropdown = dcc.Dropdown(options=testdrives,
-                        value='T2-B_SL_NBTC_20230125202407',  # initial value displayed when page first loads
+                        value=testdrives[0],  # initial value displayed when page first loads
                         clearable=False)
 dropdown2 = dcc.Dropdown(options=topics,
-                        value=topics[1],  
+                        value=topics[0],  
                         clearable=False)
 dropdown3 = dcc.Dropdown(options=['month','vehicle'],
                         value='vehicle', 
@@ -174,12 +172,14 @@ app.layout = dbc.Container([
     ],className="mt-2", justify='center'),
     # dcc.Store inside the user's current browser session
     dcc.Store(id='store-data', data=[], storage_type='memory'),
+    dcc.Store(id='store-data2', data=[], storage_type='memory'),  # 'local' or 'session'
 ], fluid=True, style={'backgroundColor':'#F5F5F5'})
 #-------------------------------------------------------------------------------------------------------
 # Callback for interactive components
 @app.callback(
     Output(testdrive_name, 'children'), # (component_id, component_property)
     Output('store-data', 'data'),
+    Output('store-data2', 'data'),
     Input(dropdown, 'value')
 )
 def get_data(testdrive):  # function arguments come from the component property of the Input
@@ -197,7 +197,7 @@ def get_data(testdrive):  # function arguments come from the component property 
     df['elasped_time'] = df['elasped_time'].apply(lambda dt: dt.strftime('%H:%M:%S'))
     df['msg.mode'] = df['msg.mode'].map({'True': True, 'False': False})
 
-    return 'Viewing '+ testdrive, df.to_dict('records') # returned objects are assigned to the Output
+    return 'Viewing '+ testdrive, df.to_dict('records'), incident_dict[testdrive] # returned objects are assigned to the Output
 
 @app.callback(
     Output('hist1', 'figure'),
@@ -252,14 +252,22 @@ def mileage_chart(var):
 @app.callback(
     Output('para_chart', 'figure'),
     Input('store-data', 'data'),
-    Input(dropdown, 'value'),
+    Input('store-data2', 'data'),
     Input(dropdown2, 'value')
 )
-def parameter_chart(data,testdrive,topic):
+def parameter_chart(data,incident_d,topic):
     df = pd.DataFrame(data)
     df['elasped_time'] = df['elasped_time'].apply(lambda t: t[3:])
     # print(incident_d)
-    incident_d = incident_dict[testdrive]
+
+    # t_con1 = []
+    # t_con2 = []
+    # if len(incident_d['loc1']) > 0:
+    #     con1 = pd.Series(incident_d['loc1'])
+    #     t_con1 = df.iloc[con1]['elasped_time']
+    # if len(incident_d['loc2']) > 0:
+    #     con1 = pd.Series(incident_d['loc2'])
+    #     t_con1 = df.iloc[con1]['elasped_time']
     con1 = pd.Series(incident_d['loc1'])
     con2 = pd.Series(incident_d['loc2'])
     t_con1 = df.iloc[con1]['elasped_time']
@@ -292,7 +300,7 @@ def parameter_chart(data,testdrive,topic):
     fig.add_trace(go.Scatter(mode='markers',x=t_con2,
                             y=np.zeros(len(df)),
                             marker_symbol='line-ns',
-                            marker_line_color="blue", opacity=1,
+                            marker_line_color="darkorange", opacity=1,
                             marker_line_width=2, marker_size=20,
                             name='Condition 2'
                             ),
@@ -352,15 +360,22 @@ def parameter_chart(data,testdrive,topic):
 @app.callback(
     Output('wp_chart', 'figure'),
     Input('store-data', 'data'),
+    Input('store-data2', 'data'),
     Input(dropdown, 'value')
 )
-def waypoint_chart(data,testdrive):
-    incident_d = incident_dict[testdrive]
+def waypoint_chart(data,incident_d,testdrive):
     df = pd.DataFrame(data)
     testdrive = testdrive.replace('-','')
     testdrive = testdrive.replace('Chula','CU')
     vehicle,operator,location,date = testdrive.split('_')
     submap = map.loc[location].loc[vehicle]
+
+    # con1 = []
+    # con2 = []
+    # if len(incident_d['loc1']) > 0:
+    #     con1 = pd.Series(incident_d['loc1'])
+    # if len(incident_d['loc2']) > 0:
+    #     con2 = pd.Series(incident_d['loc2'])
     con1 = pd.Series(incident_d['loc1'])
     con2 = pd.Series(incident_d['loc2'])
 
@@ -385,7 +400,7 @@ def waypoint_chart(data,testdrive):
                             marker_line_width=2, marker_size=15,name='condition 1'
                             ))
     fig.add_trace(go.Scatter(mode="markers", x=df.iloc[con2]['pose.position.x'], y=df.iloc[con2]['pose.position.y'], marker_symbol='y-down',
-                            marker_line_color="blue", marker_color="blue",
+                            marker_line_color="darkorange", marker_color="darkorange",
                             marker_line_width=2, marker_size=15,name='condition 2'
                             ))
     fig.update_layout(
@@ -413,3 +428,4 @@ if __name__=='__main__':
 
 # ref
 # https://dashcheatsheet.pythonanywhere.com/
+# https://testdriven.io/blog/flask-render-deployment/
