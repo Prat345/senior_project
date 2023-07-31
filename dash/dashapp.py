@@ -52,14 +52,14 @@ bar_testdrive = dcc.Graph(figure=fig0)
 pie_mileage = dcc.Graph(id='pie1',figure={})
 hist_mode = dcc.Graph(id='hist1',figure={})
 
-testdrive_name = dcc.Markdown(children='Viewing '+testdrives[0])
+testdrive_name = dcc.Markdown(children='Viewing '+'T2-B_SL_NBTC_20230125202407')
 para_chart = dcc.Graph(id='para_chart',figure={})
 wp_chart = dcc.Graph(id='wp_chart',figure={})
 dropdown = dcc.Dropdown(options=testdrives,
-                        value=testdrives[0],  # initial value displayed when page first loads
+                        value='T2-B_SL_NBTC_20230125202407',  # initial value displayed when page first loads
                         clearable=False)
 dropdown2 = dcc.Dropdown(options=topics,
-                        value=topics[0],  
+                        value=topics[1],  
                         clearable=False)
 dropdown3 = dcc.Dropdown(options=['month','vehicle'],
                         value='vehicle', 
@@ -174,14 +174,12 @@ app.layout = dbc.Container([
     ],className="mt-2", justify='center'),
     # dcc.Store inside the user's current browser session
     dcc.Store(id='store-data', data=[], storage_type='memory'),
-    dcc.Store(id='store-data2', data=[], storage_type='memory'),  # 'local' or 'session'
 ], fluid=True, style={'backgroundColor':'#F5F5F5'})
 #-------------------------------------------------------------------------------------------------------
 # Callback for interactive components
 @app.callback(
     Output(testdrive_name, 'children'), # (component_id, component_property)
     Output('store-data', 'data'),
-    Output('store-data2', 'data'),
     Input(dropdown, 'value')
 )
 def get_data(testdrive):  # function arguments come from the component property of the Input
@@ -199,7 +197,7 @@ def get_data(testdrive):  # function arguments come from the component property 
     df['elasped_time'] = df['elasped_time'].apply(lambda dt: dt.strftime('%H:%M:%S'))
     df['msg.mode'] = df['msg.mode'].map({'True': True, 'False': False})
 
-    return 'Viewing '+ testdrive, df.to_dict('records'), incident_dict[testdrive] # returned objects are assigned to the Output
+    return 'Viewing '+ testdrive, df.to_dict('records') # returned objects are assigned to the Output
 
 @app.callback(
     Output('hist1', 'figure'),
@@ -254,13 +252,14 @@ def mileage_chart(var):
 @app.callback(
     Output('para_chart', 'figure'),
     Input('store-data', 'data'),
-    Input('store-data2', 'data'),
+    Input(dropdown, 'value'),
     Input(dropdown2, 'value')
 )
-def parameter_chart(data,incident_d,topic):
+def parameter_chart(data,testdrive,topic):
     df = pd.DataFrame(data)
     df['elasped_time'] = df['elasped_time'].apply(lambda t: t[3:])
     # print(incident_d)
+    incident_d = incident_dict[testdrive]
     con1 = pd.Series(incident_d['loc1'])
     con2 = pd.Series(incident_d['loc2'])
     t_con1 = df.iloc[con1]['elasped_time']
@@ -353,10 +352,10 @@ def parameter_chart(data,incident_d,topic):
 @app.callback(
     Output('wp_chart', 'figure'),
     Input('store-data', 'data'),
-    Input('store-data2', 'data'),
     Input(dropdown, 'value')
 )
-def waypoint_chart(data,incident_d,testdrive):
+def waypoint_chart(data,testdrive):
+    incident_d = incident_dict[testdrive]
     df = pd.DataFrame(data)
     testdrive = testdrive.replace('-','')
     testdrive = testdrive.replace('Chula','CU')
