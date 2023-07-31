@@ -196,7 +196,9 @@ def get_data(testdrive):  # function arguments come from the component property 
     df.iloc[:,1:] = df.iloc[:,1:].round(3)
     df['elasped_time'] = df['elasped_time'].apply(lambda dt: dt.strftime('%H:%M:%S'))
     df['msg.mode'] = df['msg.mode'].map({'True': True, 'False': False})
+    print(f'\n>>>>>> Testdrive')
     print(df.head())
+    print(incident_dict[testdrive])
 
     return 'Viewing '+ testdrive, df.to_dict('records') # returned objects are assigned to the Output
 
