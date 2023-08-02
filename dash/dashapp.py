@@ -198,7 +198,7 @@ def get_data(testdrive):  # function arguments come from the component property 
     df.iloc[:,1:] = df.iloc[:,1:].round(3)
     df['elasped_time'] = df['elasped_time'].apply(lambda dt: dt.strftime('%H:%M:%S'))
     df['msg.mode'] = df['msg.mode'].map({'True': True, 'False': False})
-    print(f'\n>>>>>> Testdrive')
+    print(f'\n>>>>>> {testdrive}')
     print(df.head())
     print(incident_dict[testdrive])
     return 'Viewing '+ testdrive, df.to_dict('records'), incident_dict[testdrive] # returned objects are assigned to the Output
@@ -270,8 +270,8 @@ def parameter_chart(data,incident_d,topic):
         con1 = pd.Series(incident_d['loc1'])
         t_con1 = df.iloc[con1]['elasped_time']
     if len(incident_d['loc2']) > 0:
-        con1 = pd.Series(incident_d['loc2'])
-        t_con1 = df.iloc[con1]['elasped_time']
+        con2 = pd.Series(incident_d['loc2'])
+        t_con2 = df.iloc[con2]['elasped_time']
     # con1 = pd.Series(incident_d['loc1'])
     # con2 = pd.Series(incident_d['loc2'])
     # t_con1 = df.iloc[con1]['elasped_time']
