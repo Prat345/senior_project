@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import os
 import pymongo
+import time
 
 color1 = '#4da6ff' # auto
 color2 = '#8cff66' # manual
@@ -185,7 +186,7 @@ app.layout = dbc.Container([
     Input(dropdown, 'value')
 )
 def get_data(testdrive):  # function arguments come from the component property of the Input
-    # print(testdrive)
+    t1 = time.time()
     collection = db1[testdrive]
     df = collection.find()
     df = pd.DataFrame(df, dtype = 'float64')
@@ -198,9 +199,13 @@ def get_data(testdrive):  # function arguments come from the component property 
     df.iloc[:,1:] = df.iloc[:,1:].round(3)
     df['elasped_time'] = df['elasped_time'].apply(lambda dt: dt.strftime('%H:%M:%S'))
     df['msg.mode'] = df['msg.mode'].map({'True': True, 'False': False})
-    print(f'\n>>>>>> {testdrive}')
+    t2 = time.time()
+    print('\n+' + '-'*150 + '+')
+    print(f'>>> {round(t2-t1,2)} s')
+    print(f'>>> Testdrive: {testdrive}')
     print(df.head())
-    print(incident_dict[testdrive])
+    print(f'>>> Incident :{incident_dict[testdrive]}')
+    print('+' + '-'*150 + '+\n')
     return 'Viewing '+ testdrive, df.to_dict('records'), incident_dict[testdrive] # returned objects are assigned to the Output
 
 @app.callback(
@@ -264,18 +269,10 @@ def parameter_chart(data,incident_d,topic):
     df['elasped_time'] = df['elasped_time'].apply(lambda t: t[3:])
     # print(incident_d)
 
-    t_con1 = []
-    t_con2 = []
-    if len(incident_d['loc1']) > 0:
-        con1 = pd.Series(incident_d['loc1'])
-        t_con1 = df.iloc[con1]['elasped_time']
-    if len(incident_d['loc2']) > 0:
-        con2 = pd.Series(incident_d['loc2'])
-        t_con2 = df.iloc[con2]['elasped_time']
-    # con1 = pd.Series(incident_d['loc1'])
-    # con2 = pd.Series(incident_d['loc2'])
-    # t_con1 = df.iloc[con1]['elasped_time']
-    # t_con2 = df.iloc[con2]['elasped_time']
+    con1 = pd.Series(incident_d['loc1'])
+    con2 = pd.Series(incident_d['loc2'])
+    t_con1 = df.iloc[con1]['elasped_time']
+    t_con2 = df.iloc[con2]['elasped_time']
 
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, row_heights=[0.1,0.8,0.1])
     if topic == 'mileages':
@@ -374,14 +371,8 @@ def waypoint_chart(data,incident_d,testdrive):
     vehicle,operator,location,date = testdrive.split('_')
     submap = map.loc[location].loc[vehicle]
 
-    con1 = []
-    con2 = []
-    if len(incident_d['loc1']) > 0:
-        con1 = pd.Series(incident_d['loc1'])
-    if len(incident_d['loc2']) > 0:
-        con2 = pd.Series(incident_d['loc2'])
-    # con1 = pd.Series(incident_d['loc1'])
-    # con2 = pd.Series(incident_d['loc2'])
+    con1 = pd.Series(incident_d['loc1'])
+    con2 = pd.Series(incident_d['loc2'])
 
     if 'NBTC' in testdrive.upper():
         tick = 20
