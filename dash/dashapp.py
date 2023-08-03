@@ -12,7 +12,8 @@ import time
 color1 = '#4da6ff' # auto
 color2 = '#8cff66' # manual
 color3 = 'teal'
-
+color4 = 'red' # con1
+color5 = 'blue' # con2
 connect = 'mongodb+srv://kopkap:kopkap123@cluster0.agjmc4n.mongodb.net/?retryWrites=true&w=majority' # Atlas
 # connect = 'mongodb://localhost:27017' # Compass 
 cluster = pymongo.MongoClient(connect)
@@ -27,15 +28,14 @@ info_col = db2['Testdrive_info']
 info = info_col.find()
 info = pd.DataFrame(info, dtype = 'float64') 
 info.drop(columns = ['_id','Unnamed: 0'],inplace=True)
+# info['datetime'] = info['datetime'].astype('datetime64[ns]')
 info_sort = info.sort_values(by=['datetime'])
 avg_auto = (info['p_auto']*info['mileages']).sum()/info['mileages'].sum()
 avg_auto = round(avg_auto,1)
-# testdrives = os.listdir('D:\FOOH\Senior_Project/testdrives')
-# info = pd.read_csv(f'D:\FOOH\Senior_Project/testdrive_info.csv')
 map = pd.read_csv('station.csv', index_col=['location','vehicle','index'], skipinitialspace=True)
 topics = ['twist.linear.x','linear_acceleration.x_filtered', 'msg.brake', 'mileages']
 
-fig0 = px.bar(info.dropna(subset='mileages'), x='testdrive', y='mileages',
+fig0 = px.bar(info_sort.dropna(subset='mileages'), x='testdrive', y='mileages',
              hover_data=['p_auto', 'p_manual'], color='p_auto',
              labels={'pop':'population of Canada'}, height=300, 
              text_auto='.2s',
@@ -186,6 +186,7 @@ app.layout = dbc.Container([
     Input(dropdown, 'value')
 )
 def get_data(testdrive):  # function arguments come from the component property of the Input
+    # print(testdrive)
     t1 = time.time()
     collection = db1[testdrive]
     df = collection.find()
@@ -200,12 +201,12 @@ def get_data(testdrive):  # function arguments come from the component property 
     df['elasped_time'] = df['elasped_time'].apply(lambda dt: dt.strftime('%H:%M:%S'))
     df['msg.mode'] = df['msg.mode'].map({'True': True, 'False': False})
     t2 = time.time()
-    print('\n+' + '-'*150 + '+')
+    print('\n+' + '-'*120 + '+')
     print(f'>>> {round(t2-t1,2)} s')
     print(f'>>> Testdrive: {testdrive}')
     print(df.head())
     print(f'>>> Incident :{incident_dict[testdrive]}')
-    print('+' + '-'*150 + '+\n')
+    print('+' + '-'*120 + '+\n')
     return 'Viewing '+ testdrive, df.to_dict('records'), incident_dict[testdrive] # returned objects are assigned to the Output
 
 @app.callback(
@@ -243,7 +244,7 @@ def mileage_chart(var):
                             xanchor="left",
                             x=0.1
                             ))
-    fig.update_traces(textfont_size=10, textangle=0, textposition="inside", cliponaxis=False)
+    fig.update_traces(textfont_size=10, textangle=0, textposition="inside", insidetextanchor="middle", cliponaxis=False)
 
     fig2 = px.pie(names=index,values=by_var['mileages'], height=200, hole=0.7,
                   color_discrete_sequence=px.colors.sequential.RdBu_r)
@@ -290,20 +291,20 @@ def parameter_chart(data,incident_d,topic):
                          name=topic
                          ),
                     row=2,col=1)
-    fig.add_trace(go.Scatter(mode='markers',x=t_con1,
-                            y=np.zeros(len(df)),
-                            marker_symbol='line-ns',
-                            marker_line_color="red", opacity=1,
-                            marker_line_width=2, marker_size=20,
-                            name='Condition 1'
-                            ),
-                        row=3,col=1)
     fig.add_trace(go.Scatter(mode='markers',x=t_con2,
                             y=np.zeros(len(df)),
                             marker_symbol='line-ns',
-                            marker_line_color="darkorange", opacity=1,
+                            marker_line_color=color5, opacity=1,
                             marker_line_width=2, marker_size=20,
                             name='Condition 2'
+                            ),
+                        row=3,col=1)
+    fig.add_trace(go.Scatter(mode='markers',x=t_con1,
+                            y=np.zeros(len(df)),
+                            marker_symbol='line-ns',
+                            marker_line_color=color4, opacity=1,
+                            marker_line_width=2, marker_size=20,
+                            name='Condition 1'
                             ),
                         row=3,col=1)
     fig.add_trace(go.Scatter(mode='markers',x=df[df['msg.mode']==True]['elasped_time'], 
@@ -355,7 +356,7 @@ def parameter_chart(data,incident_d,topic):
                     xanchor="left",
                     x=0.1
                     ))
-    fig.update_traces(line_color=color3,line_width=0.6)
+    fig.update_traces(line_color=color3,line_width=1)
     return fig
 
 @app.callback(
@@ -385,19 +386,22 @@ def waypoint_chart(data,incident_d,testdrive):
                             marker_size=50,
                             name='stations'
                             ))
-    fig.add_trace(go.Scatter(x=df['pose.position.x'], y=df['pose.position.y'],mode='lines', name='Route'))
+    fig.add_trace(go.Scatter(x=df['pose.position.x'], y=df['pose.position.y'],mode='lines',
+                            name='Route', line_color=color3,
+                            line_width = 3, opacity=0.6))
     fig.add_trace(go.Scatter(x=np.array(df['pose.position.x'][0]), y=np.array(df['pose.position.y'][0]), marker_symbol='triangle-up',
                             marker_line_color="black", marker_color="yellow",
                             marker_line_width=1, marker_size=15,name='start'
                             ))
-    fig.add_trace(go.Scatter(mode="markers", x=df.iloc[con1]['pose.position.x'], y=df.iloc[con1]['pose.position.y'], marker_symbol='y-up',
-                            marker_line_color="red", marker_color="red",
-                            marker_line_width=2, marker_size=15,name='condition 1'
-                            ))
     fig.add_trace(go.Scatter(mode="markers", x=df.iloc[con2]['pose.position.x'], y=df.iloc[con2]['pose.position.y'], marker_symbol='y-down',
-                            marker_line_color="darkorange", marker_color="darkorange",
+                            marker_line_color=color5, marker_color=color5,
                             marker_line_width=2, marker_size=15,name='condition 2'
                             ))
+    fig.add_trace(go.Scatter(mode="markers", x=df.iloc[con1]['pose.position.x'], y=df.iloc[con1]['pose.position.y'], marker_symbol='y-up',
+                            marker_line_color=color4, marker_color=color4,
+                            marker_line_width=2, marker_size=15,name='condition 1'
+                            ))
+
     fig.update_layout(
                 margin=dict(l=10, r=10, t=0, b=20),
                 height=350,
@@ -413,10 +417,8 @@ def waypoint_chart(data,incident_d,testdrive):
                     x=0.1
                     )
                 )
-    fig.update_traces(line_color=color3,line_width = 3)
     return fig
 #-------------------------------------------------------------------------------------------------------
-
 # Run app
 if __name__=='__main__':
     app.run_server(debug=True)
